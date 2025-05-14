@@ -1,61 +1,88 @@
-// src/components/SavedJobs.jsx
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useLikedJobs } from "../contexts/LikedJobsContext";
 import { FaHeart, FaLink } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
+import Sidebar from "./Sidebar";
 
 export default function SavedJobs() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { likedJobs, toggleLike } = useLikedJobs();
 
   return (
-    <Container>
-      <h2>찜한 채용공고</h2>
-      {likedJobs.length === 0 ? (
-        <Empty>아직 찜한 공고가 없습니다.</Empty>
-      ) : (
-        <JobList>
-          {likedJobs.map((job) => (
-            <JobCard key={job.id}>
-              <div className="text-block">
-                <strong>{job.company_name}</strong>
-                <p>{job.job_title} / {job.experience_level}</p>
-                <p>{job.location} | {job.employment_type}</p>
-              </div>
+    <Container sidebarOpen={sidebarOpen}>
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <div className="content">
+        <div className="top-bar">
+          <h2>찜한 공고 전체보기</h2>
+        </div>
 
-              <div className="right-section">
-                <button className="like-btn" onClick={() => toggleLike(job)}>
-                  <FaHeart />
-                  <span>찜 취소</span>
-                </button>
+        {likedJobs.length === 0 ? (
+          <Empty>아직 찜한 공고가 없습니다.</Empty>
+        ) : (
+          <JobList>
+            {likedJobs.map((job) => (
+              <JobCard key={job.id}>
+                <div className="text-block">
+                  <strong>{job.company_name}</strong>
+                  <p>{job.job_title} / {job.experience_level}</p>
+                  <p>{job.location} | {job.employment_type}</p>
+                </div>
 
-                {job.link && (
-                  <a
-                    href={job.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="view-link"
-                  >
-                    <FaLink />
-                    <span>공고 확인</span>
-                  </a>
-                )}
-              </div>
-            </JobCard>
-          ))}
-        </JobList>
-      )}
+                <div className="right-section">
+                  <button className="like-btn" onClick={() => toggleLike(job)}>
+                    <FaHeart />
+                    <span>찜 취소</span>
+                  </button>
+
+                  {job.link && (
+                    <a
+                      href={job.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="view-link"
+                    >
+                      <FaLink />
+                      <span>공고 확인</span>
+                    </a>
+                  )}
+                </div>
+              </JobCard>
+            ))}
+          </JobList>
+        )}
+      </div>
     </Container>
   );
 }
 
 const Container = styled.div`
-  padding: 2rem;
-  color: white;
+  display: flex;
 
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: #ffc107;
+  .content {
+    margin-left: ${({ sidebarOpen }) => (sidebarOpen ? "18vw" : "4.5rem")};
+    padding: 2rem;
+    flex-grow: 1;
+    transition: margin-left 0.3s ease-in-out;
+    color: white;
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .hamburger {
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #ffc107;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color:rgb(248, 247, 244);
+    }
   }
 `;
 

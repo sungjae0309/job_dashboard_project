@@ -15,10 +15,10 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
         </div>
       </div>
       <div className="links">
-        <a href="#" data-label="홈" isOpen={isOpen}>
+        <Link to="/" data-label="홈 가기" isOpen={isOpen}>
           <MdSpaceDashboard />
           <span>홈 가기</span>
-        </a>
+        </Link>
         <a href="#" data-label="내 정보 수정" isOpen={isOpen}>
           <FiUser />
           <span>프로필 수정</span>
