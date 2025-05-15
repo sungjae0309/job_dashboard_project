@@ -55,7 +55,7 @@ export default function Experience() {
   return (
     <Wrapper>
       <FormContainer>
-        <Title>포트폴리오 입력 (선택)</Title>
+        <Title>포트폴리오 입력</Title>
         <form onSubmit={handleNext}>
           {items.map((item, index) => (
             <InputGroup key={index}>

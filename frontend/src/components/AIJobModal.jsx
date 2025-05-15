@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import {
   FaHeart,
   FaRegHeart,
@@ -13,6 +13,8 @@ import { useLikedJobs } from "../contexts/LikedJobsContext";
 export default function AIJobModal({ jobPosts, onClose }) {
   const { likedJobs, toggleLike } = useLikedJobs();
   const [expandedReasons, setExpandedReasons] = useState([]);
+  const [showTooltipIndex, setShowTooltipIndex] = useState(null);
+  const [showChatbot, setShowChatbot] = useState(false);
 
   const toggleReason = (index) => {
     setExpandedReasons((prev) =>
@@ -45,7 +47,7 @@ export default function AIJobModal({ jobPosts, onClose }) {
                     liked={likedJobs.some((j) => j.id === job.id)}
                     onClick={() => toggleLike(job)}
                   >
-                    {likedJobs.includes(index) ? <FaHeart /> : <FaRegHeart />}
+                    {likedJobs.some((j) => j.id === job.id) ? <FaHeart /> : <FaRegHeart />}
                     <span>찜하기</span>
                   </LikeSection>
 
@@ -76,12 +78,44 @@ export default function AIJobModal({ jobPosts, onClose }) {
 
               {expandedReasons.includes(index) && (
                 <ReasonText>
-                  이 기업은 당신의 관심 직무, 기술 스택, 평균 학점, 나이와 잘 맞는 공고로 추천되었습니다.
+                  <div className="content">
+                    <span>
+                      이 기업은 당신의 관심 직무, 기술 스택, 평균 학점, 나이와 잘 맞는 공고로 추천되었습니다.
+                    </span>
+                    <div
+                      style={{ position: "relative" }}
+                      onMouseEnter={() => setShowTooltipIndex(index)}
+                      onMouseLeave={() => setShowTooltipIndex(null)}
+                    >
+                      <ChatbotButton onClick={() => setShowChatbot(true)}>
+                        챗봇 연결
+                      </ChatbotButton>
+                      {showTooltipIndex === index && (
+                        <Tooltip>이 버튼을 누르면 챗봇이 더 자세하게 설명해줘요!</Tooltip>
+                      )}
+                    </div>
+                  </div>
                 </ReasonText>
               )}
             </JobCard>
           ))}
         </JobList>
+
+        {showChatbot && (
+          <ChatbotPopup>
+            <div className="chat-header">
+              <span>AI 챗봇</span>
+              <button onClick={() => setShowChatbot(false)}>×</button>
+            </div>
+            <div className="chat-body">
+              <p>무엇이 궁금하신가요?</p>
+            </div>
+            <div className="chat-input">
+              <input type="text" placeholder="메시지를 입력하세요..." />
+              <button>전송</button>
+            </div>
+          </ChatbotPopup>
+        )}
       </ModalContainer>
     </ModalOverlay>
   );
@@ -108,6 +142,7 @@ const ModalContainer = styled.div`
   border-radius: 1rem;
   overflow-y: auto;
   color: white;
+  position: relative;
 `;
 
 const Header = styled.div`
@@ -143,7 +178,6 @@ const JobCard = styled.div`
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
-      text-align: left;
 
       strong {
         font-size: 1.1rem;
@@ -151,7 +185,6 @@ const JobCard = styled.div`
       }
 
       p {
-        margin: 0.2rem 0;
         font-size: 0.95rem;
         color: #ccc;
       }
@@ -171,14 +204,10 @@ const JobCard = styled.div`
         font-weight: bold;
         cursor: pointer;
         color: #f0f0f0;
-        transition: color 0.3s;
-        text-decoration: none;
+        text-decoration: none; /* ✅ 밑줄 제거 */
       }
 
-      .reason:hover {
-        color: #81c784;
-      }
-
+      .reason:hover,
       .reason.active {
         color: #81c784;
       }
@@ -202,7 +231,6 @@ const LikeSection = styled.div`
   font-weight: bold;
   cursor: pointer;
   color: ${(props) => (props.liked ? "#ff4d4d" : "#f0f0f0")};
-  transition: color 0.3s;
 
   &:hover {
     color: #ff4d4d;
@@ -216,6 +244,116 @@ const ReasonText = styled.div`
   color: #ccc;
   border-radius: 0.5rem;
   font-size: 0.85rem;
-  line-height: 1.5;
   border-left: 4px solid #81c784;
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  span {
+    flex: 1;
+    white-space: normal;
+    word-break: keep-all;
+  }
+`;
+
+const ChatbotButton = styled.button`
+  background-color: #424242;
+  color: #81c784;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #616161;
+  }
+`;
+
+const Tooltip = styled.div`
+  position: absolute;
+  top: -2.2rem;
+  right: 0;
+  background: #444;
+  color: #ffd54f;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.75rem;
+  border-radius: 0.4rem;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+`;
+
+const ChatbotPopup = styled.div`
+  position: fixed;
+  top: 20%;
+  right: 2%; /* ✅ 간격 줄임 */
+  width: 260px;
+  height: 360px;
+  background-color: #1e1e1e;
+  color: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  z-index: 500;
+
+  .chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #333;
+    padding: 0.6rem 1rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    font-weight: bold;
+
+    button {
+      background: none;
+      color: white;
+      font-size: 1.2rem;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .chat-body {
+    flex: 1;
+    padding: 1rem;
+    font-size: 0.9rem;
+    overflow-y: auto;
+  }
+
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #444;
+    padding: 0.5rem;
+
+    input {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 0.4rem;
+      margin-right: 0.5rem;
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      padding: 0.5rem 0.8rem;
+      background-color: #81c784;
+      border: none;
+      border-radius: 0.4rem;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
 `;
