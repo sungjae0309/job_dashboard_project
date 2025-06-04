@@ -15,6 +15,10 @@ export default function SkillSelection() {
   const [otherFramework, setOtherFramework] = useState("");
   const [otherTool, setOtherTool] = useState("");
 
+  const [showLanguage, setShowLanguage] = useState(true);
+  const [showFramework, setShowFramework] = useState(true);
+  const [showTool, setShowTool] = useState(true);
+
   const navigate = useNavigate();
 
   const toggleSelection = (skill, setFunc, selected) => {
@@ -43,70 +47,91 @@ export default function SkillSelection() {
     <Container>
       <Box>
         <Section>
-          <Title>언어</Title>
-          <SubTitle>가장 자신있는 언어를 골라주세요</SubTitle>
-          <SkillGrid>
-            {languageSkills.map((skill) => (
-              <SkillTag
-                key={skill}
-                selected={selectedLanguages.includes(skill)}
-                onClick={() => toggleSelection(skill, setSelectedLanguages, selectedLanguages)}
-              >
-                {skill}
-              </SkillTag>
-            ))}
-          </SkillGrid>
-          <OtherInput
-            placeholder="기타 자유롭게 작성"
-            value={otherLanguage}
-            onChange={(e) => setOtherLanguage(e.target.value)}
-          />
+          <ToggleHeader onClick={() => setShowLanguage(!showLanguage)}>
+            <Title>언어</Title>
+            <ToggleText>{showLanguage ? "접기 ▲" : "펼치기 ▼"}</ToggleText>
+          </ToggleHeader>
+          {showLanguage && (
+            <div>
+              <SubTitle>가장 자신있는 언어를 골라주세요</SubTitle>
+              <SkillGrid>
+                {languageSkills.map((skill) => (
+                  <SkillTag
+                    key={skill}
+                    selected={selectedLanguages.includes(skill)}
+                    onClick={() => toggleSelection(skill, setSelectedLanguages, selectedLanguages)}
+                  >
+                    {skill}
+                  </SkillTag>
+                ))}
+              </SkillGrid>
+              <OtherInput
+                placeholder="기타 자유롭게 작성"
+                value={otherLanguage}
+                onChange={(e) => setOtherLanguage(e.target.value)}
+              />
+            </div>
+          )}
         </Section>
 
         <Divider />
 
         <Section>
-          <Title>프레임워크</Title>
-          <SubTitle>가장 잘 다룰 수 있는 프레임워크를 골라주세요</SubTitle>
-          <SkillGrid>
-            {frameworkSkills.map((skill) => (
-              <SkillTag
-                key={skill}
-                selected={selectedFrameworks.includes(skill)}
-                onClick={() => toggleSelection(skill, setSelectedFrameworks, selectedFrameworks)}
-              >
-                {skill}
-              </SkillTag>
-            ))}
-          </SkillGrid>
-          <OtherInput
-            placeholder="기타 자유롭게 작성"
-            value={otherFramework}
-            onChange={(e) => setOtherFramework(e.target.value)}
-          />
+          <ToggleHeader onClick={() => setShowFramework(!showFramework)}>
+            <Title>프레임워크</Title>
+            <ToggleText>{showFramework ? "접기 ▲" : "펼치기 ▼"}</ToggleText>
+          </ToggleHeader>
+          {showFramework && (
+            <div>
+              <SubTitle>가장 잘 다룰 수 있는 프레임워크를 골라주세요</SubTitle>
+              <SkillGrid>
+                {frameworkSkills.map((skill) => (
+                  <SkillTag
+                    key={skill}
+                    selected={selectedFrameworks.includes(skill)}
+                    onClick={() => toggleSelection(skill, setSelectedFrameworks, selectedFrameworks)}
+                  >
+                    {skill}
+                  </SkillTag>
+                ))}
+              </SkillGrid>
+              <OtherInput
+                placeholder="기타 자유롭게 작성"
+                value={otherFramework}
+                onChange={(e) => setOtherFramework(e.target.value)}
+              />
+            </div>
+          )}
         </Section>
 
         <Divider />
 
         <Section>
-          <Title>협업 툴</Title>
-          <SubTitle>가장 많이 다뤄본 협업 툴을 골라주세요</SubTitle>
-          <SkillGrid>
-            {collaborationTools.map((tool) => (
-              <SkillTag
-                key={tool}
-                selected={selectedTools.includes(tool)}
-                onClick={() => toggleSelection(tool, setSelectedTools, selectedTools)}
-              >
-                {tool}
-              </SkillTag>
-            ))}
-          </SkillGrid>
-          <OtherInput
-            placeholder="기타 자유롭게 작성"
-            value={otherTool}
-            onChange={(e) => setOtherTool(e.target.value)}
-          />
+          <ToggleHeader onClick={() => setShowTool(!showTool)}>
+            <Title>협업 툴</Title>
+            <ToggleText>{showTool ? "접기 ▲" : "펼치기 ▼"}</ToggleText>
+          </ToggleHeader>
+          {showTool && (
+            <div>
+              <SubTitle>가장 많이 다뤄본 협업 툴을 골라주세요</SubTitle>
+              <SkillGrid>
+                {collaborationTools.map((tool) => (
+                  <SkillTag
+                    key={tool}
+                    selected={selectedTools.includes(tool)}
+                    onClick={() => toggleSelection(tool, setSelectedTools, selectedTools)}
+                  >
+                    {tool}
+                  </SkillTag>
+                ))}
+              </SkillGrid>
+              <OtherInput
+                placeholder="기타 자유롭게 작성"
+                value={otherTool}
+                onChange={(e) => setOtherTool(e.target.value)}
+              />
+            </div>
+          )}
         </Section>
 
         <ButtonWrapper>
@@ -132,10 +157,23 @@ const Box = styled.div`
   border-radius: 1rem;
   width: 700px;
   color: white;
+  transition: all 0.3s ease;
 `;
 
 const Section = styled.div`
   margin-bottom: 2rem;
+`;
+
+const ToggleHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const ToggleText = styled.span`
+  font-size: 0.9rem;
+  color: #aaa;
 `;
 
 const Title = styled.h2`

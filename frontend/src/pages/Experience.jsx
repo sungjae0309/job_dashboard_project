@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+
 export default function Experience() {
   const navigate = useNavigate();
   const [items, setItems] = useState([{ type: "", value: "" }]);

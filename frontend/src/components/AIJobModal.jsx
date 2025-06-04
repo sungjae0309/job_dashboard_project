@@ -71,7 +71,7 @@ export default function AIJobModal({ jobPosts, onClose }) {
                     className="action-item check"
                   >
                     <FaLink />
-                    <span>공고 확인</span>
+                    <span>링크 연결</span>
                   </a>
                 </div>
               </div>
@@ -108,8 +108,11 @@ export default function AIJobModal({ jobPosts, onClose }) {
               <button onClick={() => setShowChatbot(false)}>×</button>
             </div>
             <div className="chat-body">
-              <p>무엇이 궁금하신가요?</p>
+              <p>📌 <strong>추천 이유:</strong> 우아한형제들 프론트엔드 개발자 포지션은 React, JavaScript, HTML/CSS 등 웹 프론트엔드 기술에 능숙한 인재를 요구합니다.</p>
+              <p>사용자는 HTML/CSS, JavaScript, React, Node.js 등의 스택을 보유하고 있고, React 기반 포트폴리오 사이트와 Node.js + MongoDB 게시판 프로젝트 등의 실무형 경험을 보유하고 있어 기술적으로 적합합니다.</p>
+              <p>또한 GitHub에 3건 이상의 포트폴리오를 업로드하며 지속적인 개발 활동을 해왔고, IT 커뮤니티와 부트캠프 활동 경력도 있어 자기주도성과 커뮤니케이션 능력을 동시에 갖춘 인재로 평가됩니다.</p>
             </div>
+
             <div className="chat-input">
               <input type="text" placeholder="메시지를 입력하세요..." />
               <button>전송</button>
@@ -213,7 +216,7 @@ const JobCard = styled.div`
       }
 
       .match:hover {
-        color: #ffd54f;
+        color:rgb(221, 130, 241);
       }
 
       .check:hover {
@@ -264,16 +267,17 @@ const ReasonText = styled.div`
 
 const ChatbotButton = styled.button`
   background-color: #424242;
-  color: #81c784;
+  color:rgb(229, 236, 229);
   border: none;
   border-radius: 0.4rem;
-  padding: 0.3rem 0.7rem;
+  padding: 0.8rem 0.7rem;
   font-size: 0.75rem;
   cursor: pointer;
   white-space: nowrap;
 
   &:hover {
     background-color: #616161;
+    color: #ffd54f;
   }
 `;
 
@@ -293,8 +297,8 @@ const Tooltip = styled.div`
 
 const ChatbotPopup = styled.div`
   position: fixed;
-  top: 20%;
-  right: 2%; /* ✅ 간격 줄임 */
+  top: 25%;
+  right: 10%; /* ✅ 간격 줄임 */
   width: 260px;
   height: 360px;
   background-color: #1e1e1e;
@@ -329,6 +333,10 @@ const ChatbotPopup = styled.div`
     padding: 1rem;
     font-size: 0.9rem;
     overflow-y: auto;
+    p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    }
   }
 
   .chat-input {
@@ -348,7 +356,7 @@ const ChatbotPopup = styled.div`
 
     button {
       padding: 0.5rem 0.8rem;
-      background-color: #81c784;
+      background-color: #ffd54f;
       border: none;
       border-radius: 0.4rem;
       color: black;
