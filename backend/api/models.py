@@ -23,6 +23,7 @@ class JobPost(models.Model):
     location = models.CharField(max_length=100)
     employment_type = models.CharField(max_length=50)
     experience_level = models.CharField(max_length=50)
+    link = models.URLField(null=True, blank=True)  # ✅ 링크 필드 추가
 
     def __str__(self):
         return f"{self.company_name} - {self.job_title}"
