@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { cardStyles } from "./ReusableStyles";
-import { FaUserCircle, FaCertificate, FaLightbulb, FaSearch, FaCommentDots } from "react-icons/fa";
+import { FaCheckCircle, FaCertificate, FaQuestionCircle } from "react-icons/fa";
 
 export default function CareerInsightsCard() {
-  const [activeTab, setActiveTab] = useState("experience");
-  const [experiences, setExperiences] = useState([
-    { user: "익명 1", content: "SQLD는 기출 위주로 풀었어요!", comments: ["저도 그렇게 공부했어요!"], showComments: false },
-    { user: "익명 2", content: "FastAPI로 백엔드 만들면서 실력 쌓았어요.", comments: [], showComments: false },
-  ]);
-  const [newContent, setNewContent] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("spec");
+
+  const specs = [
+    { company: "카카오", content: "토익 850, 컴활 1급, 개발 동아리 2년 활동" },
+    { company: "라인", content: "CS 전공자, 인턴 경험 1회, 코딩 테스트 3회 합격" },
+  ];
 
   const news = [
     {
@@ -30,78 +29,39 @@ export default function CareerInsightsCard() {
     }
   ];
 
-  
-
   const tips = [
-    { tip: "이력서에는 숫자 기반 성과를 강조하세요." },
-    { tip: "자기소개서 첫 문장은 임팩트 있게 시작하세요." },
-    { tip: "GitHub 활동은 꾸준한 커밋 기록이 좋아요." },
+    { tip: "자기소개 부탁드립니다." },
+    { tip: "지원한 직무에서 가장 중요한 역량은 무엇이라고 생각하나요?" },
+    { tip: "최근에 읽은 기술 관련 기사나 책이 있다면 소개해주세요." },
+    { tip: "본인의 단점은 무엇이며, 이를 어떻게 극복하고 있나요?" },
+    { tip: "우리 회사를 선택한 이유는 무엇인가요?" },
+    { tip: "팀 프로젝트에서 갈등이 있었을 때 어떻게 해결했나요?" },
+    { tip: "지원 직무에 필요한 기술을 어떻게 습득했나요?" },
+    { tip: "1년 뒤 본인의 모습을 상상해본다면 어떤 모습일까요?" }
   ];
-
-  const handlePost = () => {
-    if (newContent.trim() !== "") {
-      setExperiences([{ user: "익명 사용자", content: newContent, comments: [], showComments: false }, ...experiences]);
-      setNewContent("");
-    }
-  };
-
-  const toggleComments = (index) => {
-    const updated = [...experiences];
-    updated[index].showComments = !updated[index].showComments;
-    setExperiences(updated);
-  };
-
-  const filteredExperiences = experiences.filter((exp) =>
-    exp.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <Section>
       <div className="tabs">
-        <button className={activeTab === "experience" ? "active" : ""} onClick={() => setActiveTab("experience")}>경험공유</button>
+        <button className={activeTab === "spec" ? "active" : ""} onClick={() => setActiveTab("spec")}>합격 스펙</button>
         <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>트렌드</button>
-        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>취업꿀팁</button>
+        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>면접 질문</button>
       </div>
 
       <div className="content">
-        {activeTab === "experience" && (
-          <>
-            <div className="search-area">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="키워드로 검색"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="list">
-              {filteredExperiences.map((exp, index) => (
-                <div className="item" key={index}>
-                  <FaUserCircle className="icon yellow" />
-                  <div className="post">
-                    <h5>{exp.user}</h5>
-                    <p>{exp.content}</p>
-                    {exp.comments.length > 0 && (
-                      <button className="toggle" onClick={() => toggleComments(index)}>
-                        {exp.showComments ? "댓글 숨기기" : `댓글 ${exp.comments.length}개 보기`}
-                      </button>
-                    )}
-                    {exp.showComments && exp.comments.length > 0 && (
-                      <div className="comments">
-                        {exp.comments.map((c, i) => (
-                          <div className="comment" key={i}>
-                            <FaCommentDots className="comment-icon" />
-                            <span>{c}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+        {activeTab === "spec" && (
+          <div className="list">
+            <p className="spec-label">합격자 스펙 요약</p>
+            {specs.map((spec, index) => (
+              <div className="item" key={index}>
+                <FaCheckCircle className="icon green" />
+                <div className="post">
+                  <p className="company">최종 합격 기업: {spec.company}</p>
+                  <p className="spec-content">{spec.content}</p>
                 </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
 
         {activeTab === "news" && (
@@ -122,8 +82,8 @@ export default function CareerInsightsCard() {
           <div className="list">
             {tips.map((t, index) => (
               <div className="item" key={index}>
-                <FaLightbulb className="icon yellow" />
-                <div>
+                <FaQuestionCircle className="icon yellow" />
+                <div className="question">
                   <p>{t.tip}</p>
                 </div>
               </div>
@@ -131,18 +91,6 @@ export default function CareerInsightsCard() {
           </div>
         )}
       </div>
-
-      {activeTab === "experience" && (
-        <div className="input-area">
-          <input
-            type="text"
-            placeholder="공유하고 싶은 경험을 입력하세요..."
-            value={newContent}
-            onChange={(e) => setNewContent(e.target.value)}
-          />
-          <button onClick={handlePost}>등록</button>
-        </div>
-      )}
     </Section>
   );
 }
@@ -193,58 +141,17 @@ const Section = styled.section`
     padding-right: 0.5rem;
   }
 
-  .search-area {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.8rem;
-    background-color: #333;
-    border-radius: 0.4rem;
-    padding: 0.4rem 0.6rem;
-
-    input {
-      flex: 1;
-      background: none;
-      border: none;
-      color: #fff;
-      padding: 0.4rem;
-      outline: none;
-      font-size: 0.9rem;
-    }
-
-    .search-icon {
-      color: #ffc107;
-    }
-  }
-
-  .input-area {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.8rem;
-
-    input {
-      flex: 1;
-      padding: 0.5rem;
-      border-radius: 0.4rem;
-      border: none;
-      outline: none;
-      font-size: 0.9rem;
-    }
-
-    button {
-      background-color: #ffc107;
-      border: none;
-      border-radius: 0.4rem;
-      padding: 0 1rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  }
-
   .list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: #ffc107;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
   }
 
   .item {
@@ -254,8 +161,12 @@ const Section = styled.section`
     line-height: 1.3;
 
     .icon {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       margin-top: 0.2rem;
+    }
+
+    .green {
+      color: #00e676;
     }
 
     .yellow {
@@ -263,45 +174,24 @@ const Section = styled.section`
     }
 
     .post {
-      h5 {
-        margin: 0;
-        color: #fff;
+      .company {
+        font-size: 0.85rem;
+        color: #4da6ff;
         font-weight: 600;
+        margin-bottom: 0.3rem;
       }
 
-      p {
-        margin: 0;
+      .spec-content {
         font-size: 0.9rem;
         color: #ccc;
       }
+    }
 
-      .toggle {
-        margin-top: 0.3rem;
-        background: none;
-        border: none;
-        color: #4da6ff;
-        cursor: pointer;
-        font-size: 0.8rem;
-        padding: 0;
-      }
-
-      .comments {
-        margin-top: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-
-        .comment {
-          display: flex;
-          align-items: center;
-          gap: 0.4rem;
-          font-size: 0.85rem;
-          color: #aaa;
-
-          .comment-icon {
-            color: #4da6ff;
-          }
-        }
+    .question {
+      p {
+        font-size: 0.9rem;
+        color: #ccc;
+        margin: 0;
       }
     }
   }

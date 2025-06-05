@@ -2,9 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { MdSpaceDashboard, MdEdit } from "react-icons/md";
 import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
-import { FaRobot } from "react-icons/fa";
+import { FaRobot, FaChartLine, FaChartBar,  FaRegCommentDots, FaRegComments  } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { BiBarChartAlt2 } from 'react-icons/bi'
+import { BsChatDots } from 'react-icons/bs'
 
 export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
   return (
@@ -17,18 +19,26 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
       <div className="links">
         <Link to="/" data-label="홈 가기" isOpen={isOpen}>
           <MdSpaceDashboard />
-          <span>홈 가기</span>
+          <span>홈 화면</span>
         </Link>
         <a href="#" data-label="내 정보 수정" isOpen={isOpen}>
           <FiUser />
-          <span>프로필 수정</span>
+          <span>내 프로필</span>
         </a>
         <Link to="/saved-jobs" data-label="찜 한 채용공고" isOpen={isOpen}>
           <FiBell />
           <span>찜 한 채용공고</span>
         </Link>
+        <Link to="/saved-jobs" data-label="그래프" isOpen={isOpen}>
+          <FaChartLine />
+          <span>그래프</span>
+        </Link>
+        <Link to="/community" data-label="커뮤니티" isOpen={isOpen}>
+          <FaRegComments />
+          <span>커뮤니티</span>
+        </Link>
         <a href="#" onClick={toggleChatbot} data-label="챗봇" isOpen={isOpen}>
-          <FaRobot />
+          <BsChatDots />
           <span>챗봇</span>
         </a>
         <a href="#" data-label="로그아웃" isOpen={isOpen}>

@@ -9,6 +9,9 @@ import Jobinterest from "./pages/Jobinterest";
 import SkillSelection from "./pages/ SkillSelection";
 import SavedJobs from "./components/SavedJobs"; 
 import { LikedJobsProvider } from "./contexts/LikedJobsContext";
+import Community from "./components/community";
+
+
 
 
 
@@ -25,6 +28,7 @@ export default function App() {
         <Route path="/jobinterest" element={<Jobinterest />} />
         <Route path="/skillselection" element={<SkillSelection />} />
         <Route path="/saved-jobs" element={<SavedJobs />} />
+        <Route path="/community" element={<Community />} />
       </Routes>
     </Router>
     </LikedJobsProvider>
