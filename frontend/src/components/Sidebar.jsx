@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { MdSpaceDashboard, MdEdit } from "react-icons/md";
 import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
-import { FaRobot, FaChartLine, FaChartBar,  FaRegCommentDots, FaRegComments  } from "react-icons/fa";
+import { FaRobot, FaChartLine, FaChartBar,  FaRegCommentDots, FaHeart, FaRegComments, FaSearch  } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
 import { BiBarChartAlt2 } from 'react-icons/bi'
@@ -25,13 +25,16 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
           <FiUser />
           <span>내 프로필</span>
         </a>
-        <Link to="/saved-jobs" data-label="찜 한 채용공고" isOpen={isOpen}>
-          <FiBell />
-          <span>찜 한 채용공고</span>
-        </Link>
-        <Link to="/saved-jobs" data-label="그래프" isOpen={isOpen}>
-          <FaChartLine />
-          <span>그래프</span>
+
+        <a href="#" data-label="공고 검색" isOpen={isOpen}>
+          <FaSearch />
+          <span>공고 검색</span>
+        </a>
+      
+        <Link to="/saved-jobs" data-label="찜 한 채용공고" isOpen={isOpen}
+        >
+          <FaHeart />
+          <span>즐겨찾기</span>
         </Link>
         <Link to="/community" data-label="커뮤니티" isOpen={isOpen}>
           <FaRegComments />

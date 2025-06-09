@@ -1,7 +1,16 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { cardStyles } from "./ReusableStyles";
-import { FaCheckCircle, FaCertificate, FaQuestionCircle } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaCertificate,
+  FaQuestionCircle,
+  FaUniversity,
+  FaBook,
+  FaBriefcase,
+  FaSyncAlt,
+  FaBuilding
+} from "react-icons/fa";
 
 export default function CareerInsightsCard() {
   const [activeTab, setActiveTab] = useState("spec");
@@ -29,23 +38,31 @@ export default function CareerInsightsCard() {
     }
   ];
 
-  const tips = [
-    { tip: "자기소개 부탁드립니다." },
-    { tip: "지원한 직무에서 가장 중요한 역량은 무엇이라고 생각하나요?" },
-    { tip: "최근에 읽은 기술 관련 기사나 책이 있다면 소개해주세요." },
-    { tip: "본인의 단점은 무엇이며, 이를 어떻게 극복하고 있나요?" },
-    { tip: "우리 회사를 선택한 이유는 무엇인가요?" },
-    { tip: "팀 프로젝트에서 갈등이 있었을 때 어떻게 해결했나요?" },
-    { tip: "지원 직무에 필요한 기술을 어떻게 습득했나요?" },
-    { tip: "1년 뒤 본인의 모습을 상상해본다면 어떤 모습일까요?" }
+  const mentors = [
+    { field: "토스", school: "중앙대학교", major: "소프트웨어학부", job: "프론트엔드 개발자" },
+    { field: "우아한형제", school: "서울대학교", major: "통계학과", job: "데이터 분석가" },
+    { field: "당근마켓", school: "연세대학교", major: "컴퓨터공학과", job: "백엔드 개발자" },
+    { field: "AI", school: "KAIST", major: "AI학과", job: "AI 엔지니어" }
   ];
+
+  const [currentMentor, setCurrentMentor] = useState(mentors[0]);
+  const [isRotating, setIsRotating] = useState(false);
+
+  const fetchMentor = () => {
+    setIsRotating(true);
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * mentors.length);
+      setCurrentMentor(mentors[randomIndex]);
+      setIsRotating(false);
+    }, 500);
+  };
 
   return (
     <Section>
       <div className="tabs">
         <button className={activeTab === "spec" ? "active" : ""} onClick={() => setActiveTab("spec")}>합격 스펙</button>
         <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>트렌드</button>
-        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>면접 질문</button>
+        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>멘토링 매칭</button>
       </div>
 
       <div className="content">
@@ -79,21 +96,46 @@ export default function CareerInsightsCard() {
         )}
 
         {activeTab === "tip" && (
-          <div className="list">
-            {tips.map((t, index) => (
-              <div className="item" key={index}>
-                <FaQuestionCircle className="icon yellow" />
-                <div className="question">
-                  <p>{t.tip}</p>
-                </div>
+          <>
+            <h4 className="mentor-title">🎓 매칭 결과</h4>
+            <div className="mentor-box">
+              <div className="mentor-header">
+                <h4>멘토 정보</h4>
+                <FaSyncAlt
+                  className={`refresh-icon ${isRotating ? "rotating" : ""}`}
+                  onClick={fetchMentor}
+                />
               </div>
-            ))}
-          </div>
+
+              
+
+              <div className="mentor-info">
+                <p><FaBuilding /><strong>기업:</strong> {currentMentor.field}</p>
+                <p><FaBriefcase /> <strong>직무:</strong> {currentMentor.job}</p>
+                <p><FaUniversity /> <strong>학교:</strong> {currentMentor.school}</p>
+                <p><FaBook /> <strong>전공:</strong> {currentMentor.major}</p>
+              </div>
+
+              <div className="mentor-actions">
+                <button className="mentor-btn">멘토에게 질문하기</button>
+                <button className="mentor-appoint-btn">멘토와 약속 잡기</button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </Section>
   );
 }
+
+const rotate360 = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
 
 const Section = styled.section`
   ${cardStyles};
@@ -137,99 +179,118 @@ const Section = styled.section`
 
   .content {
     flex: 1;
-    overflow-y: auto;
     padding-right: 0.5rem;
+    overflow: hidden; /* 스크롤 없애기 */
   }
 
-  .list {
+  .mentor-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff; /* 흰색으로 */
+    margin-bottom: 0.5rem;
+    padding-left: 0.3rem;
+  }
+
+  .mentor-box {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
-    .spec-label {
-      font-size: 0.8rem;
-      color: #ffc107;
-      margin-bottom: 0.3rem;
-      font-weight: bold;
-    }
-  }
-
-  .item {
-    display: flex;
-    gap: 0.8rem;
-    align-items: flex-start;
-    line-height: 1.3;
-
-    .icon {
-      font-size: 1.4rem;
-      margin-top: 0.2rem;
-    }
-
-    .green {
-      color: #00e676;
-    }
-
-    .yellow {
-      color: #ffc107;
-    }
-
-    .post {
-      .company {
-        font-size: 0.85rem;
-        color: #4da6ff;
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-      }
-
-      .spec-content {
-        font-size: 0.9rem;
-        color: #ccc;
-      }
-    }
-
-    .question {
-      p {
-        font-size: 0.9rem;
-        color: #ccc;
-        margin: 0;
-      }
-    }
-  }
-
-  .news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .news-card {
     background-color: #2a2a2a;
-    padding: 0.9rem 1rem;
+    padding: 1rem;
     border-radius: 0.6rem;
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid #ffc107; /* 은은한 파랑 계열로 변경 */
+    color: #ccc;
 
-    .news-header {
+    .mentor-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.5rem;
 
       h4 {
-        color: #fff;
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.05rem;
+        color: #fff;
       }
 
-      .source {
-        color: #aaa;
-        font-size: 0.8rem;
+      .refresh-icon {
+        font-size: 1.2rem;
+        color:rgb(249, 248, 244); /* 동일한 파랑 */
+        cursor: pointer;
+        transition: transform 0.5s ease;
+
+        &.rotating {
+          animation: ${rotate360} 0.6s linear;
+        }
+
+        &:hover {
+          color: #ffc107;
+        }
       }
     }
 
-    .summary {
-      font-size: 0.9rem;
-      color: #ccc;
-      margin: 0;
+    .mentor-field {
+      p {
+        font-size: 0.9rem;
+        color: #eee;
+        margin: 0;
+      }
+    }
+
+    .mentor-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      p {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #ccc;
+
+        svg {
+          color: #ccc; /* 아이콘도 글자와 통일 */
+        }
+      }
+    }
+
+    .mentor-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .mentor-btn {
+        background-color:rgb(97, 97, 95);
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 0.5rem;
+        
+        padding: 0.6rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+
+        &:hover {
+          background-color: #ffc107;
+          color: black;
+        }
+      }
+
+      .mentor-appoint-btn {
+        background-color: rgb(97, 97, 95);
+        color: white;
+        font-weight: bold;
+        
+        border-radius: 0.5rem;
+        padding: 0.6rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+
+        &:hover {
+          background-color: #ffc107;
+          color: black;
+        }
+      }
     }
   }
-`
+`;

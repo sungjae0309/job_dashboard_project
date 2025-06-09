@@ -1,27 +1,20 @@
 import React, { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import {
   FaHeart,
   FaRegHeart,
   FaThumbsUp,
-  FaLink,
-  FaCheckCircle
+  FaLink
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useLikedJobs } from "../contexts/LikedJobsContext";
 
 export default function AIJobModal({ jobPosts, onClose }) {
   const { likedJobs, toggleLike } = useLikedJobs();
-  const [expandedReasons, setExpandedReasons] = useState([]);
-  const [showTooltipIndex, setShowTooltipIndex] = useState(null);
   const [showChatbot, setShowChatbot] = useState(false);
 
-  const toggleReason = (index) => {
-    setExpandedReasons((prev) =>
-      prev.includes(index)
-        ? prev.filter((i) => i !== index)
-        : [...prev, index]
-    );
+  const handleReasonClick = () => {
+    setShowChatbot(true);
   };
 
   return (
@@ -31,6 +24,11 @@ export default function AIJobModal({ jobPosts, onClose }) {
           <h2>AI 추천 공고 전체보기</h2>
           <IoMdClose className="close-icon" onClick={onClose} />
         </Header>
+
+        {/* 공통 알고리즘 설명 */}
+        <AlgorithmExplanation>
+        추천 공고는 사용자의 정보들을 바탕으로 AI가 분석하여 추천한 결과입니다.
+        </AlgorithmExplanation>
 
         <JobList>
           {jobPosts.map((job, index) => (
@@ -51,14 +49,9 @@ export default function AIJobModal({ jobPosts, onClose }) {
                     <span>찜하기</span>
                   </LikeSection>
 
-                  <div className="action-item match">
-                    <FaCheckCircle />
-                    <span>합격 스펙</span>
-                  </div>
-
                   <div
-                    className={`action-item reason ${expandedReasons.includes(index) ? "active" : ""}`}
-                    onClick={() => toggleReason(index)}
+                    className="action-item reason"
+                    onClick={handleReasonClick}
                   >
                     <FaThumbsUp />
                     <span>추천 이유</span>
@@ -75,32 +68,11 @@ export default function AIJobModal({ jobPosts, onClose }) {
                   </a>
                 </div>
               </div>
-
-              {expandedReasons.includes(index) && (
-                <ReasonText>
-                  <div className="content">
-                    <span>
-                      이 기업은 당신의 관심 직무, 기술 스택, 평균 학점, 나이와 잘 맞는 공고로 추천되었습니다.
-                    </span>
-                    <div
-                      style={{ position: "relative" }}
-                      onMouseEnter={() => setShowTooltipIndex(index)}
-                      onMouseLeave={() => setShowTooltipIndex(null)}
-                    >
-                      <ChatbotButton onClick={() => setShowChatbot(true)}>
-                        챗봇 연결
-                      </ChatbotButton>
-                      {showTooltipIndex === index && (
-                        <Tooltip>이 버튼을 누르면 챗봇이 더 자세하게 설명해줘요!</Tooltip>
-                      )}
-                    </div>
-                  </div>
-                </ReasonText>
-              )}
             </JobCard>
           ))}
         </JobList>
 
+        {/* 챗봇 팝업 */}
         {showChatbot && (
           <ChatbotPopup>
             <div className="chat-header">
@@ -124,13 +96,15 @@ export default function AIJobModal({ jobPosts, onClose }) {
   );
 }
 
+
+
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.6); /* ✅ 흐림 효과 유지 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -159,8 +133,20 @@ const Header = styled.div`
   }
 `;
 
+const AlgorithmExplanation = styled.div`
+  margin: 1rem 0 1.5rem 0;
+  padding: 0.6rem 1rem;
+  background-color: #2b2b2b;
+  border-left: 4px solid #e57373;  /* 연한 빨간색 좌측 */
+  border-radius: 0.5rem;
+  color: #ccc; /* 밝은 회색 텍스트 */
+  font-size: 0.85rem;
+  line-height: 1.4;
+`;
+
+
+
 const JobList = styled.div`
-  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -170,7 +156,6 @@ const JobCard = styled.div`
   background: #333;
   padding: 1rem;
   border-radius: 0.8rem;
-  box-shadow: 0 0 5px rgba(43, 83, 164, 0.05);
 
   .job-header {
     display: flex;
@@ -207,21 +192,21 @@ const JobCard = styled.div`
         font-weight: bold;
         cursor: pointer;
         color: #f0f0f0;
-        text-decoration: none; /* ✅ 밑줄 제거 */
       }
 
-      .reason:hover,
-      .reason.active {
+      .reason:hover {
         color: #81c784;
       }
 
-      .match:hover {
-        color:rgb(221, 130, 241);
+      .check {
+        text-decoration: none; /* ✅ 밑줄 제거 */
       }
 
       .check:hover {
         color: #64b5f6;
+        text-decoration: none; /* ✅ 호버 시에도 유지 */
       }
+
     }
   }
 `;
@@ -240,65 +225,10 @@ const LikeSection = styled.div`
   }
 `;
 
-const ReasonText = styled.div`
-  margin-top: 1rem;
-  padding: 0.8rem 1rem;
-  background-color: #2a2a2a;
-  color: #ccc;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  border-left: 4px solid #81c784;
-
-  .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  span {
-    flex: 1;
-    white-space: normal;
-    word-break: keep-all;
-  }
-`;
-
-const ChatbotButton = styled.button`
-  background-color: #424242;
-  color:rgb(229, 236, 229);
-  border: none;
-  border-radius: 0.4rem;
-  padding: 0.8rem 0.7rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #616161;
-    color: #ffd54f;
-  }
-`;
-
-const Tooltip = styled.div`
-  position: absolute;
-  top: -2.2rem;
-  right: 0;
-  background: #444;
-  color: #ffd54f;
-  padding: 0.5rem 0.8rem;
-  font-size: 0.75rem;
-  border-radius: 0.4rem;
-  white-space: nowrap;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-`;
-
 const ChatbotPopup = styled.div`
   position: fixed;
   top: 25%;
-  right: 10%; /* ✅ 간격 줄임 */
+  right: 10%;
   width: 260px;
   height: 360px;
   background-color: #1e1e1e;
@@ -333,9 +263,10 @@ const ChatbotPopup = styled.div`
     padding: 1rem;
     font-size: 0.9rem;
     overflow-y: auto;
+
     p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
+      margin-bottom: 1rem;
+      line-height: 1.6;
     }
   }
 
