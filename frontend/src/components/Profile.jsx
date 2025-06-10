@@ -9,7 +9,9 @@ import {
   FaBook,
   FaBriefcase,
   FaSyncAlt,
-  FaBuilding
+  FaBuilding,
+  FaPlus,
+  FaMinus
 } from "react-icons/fa";
 
 export default function CareerInsightsCard() {
@@ -57,15 +59,26 @@ export default function CareerInsightsCard() {
     }, 500);
   };
 
+  const [expandedNews, setExpandedNews] = useState(null);
+
+  const toggleNews = (index) => {
+    if (expandedNews === index) {
+      setExpandedNews(null); // 접기
+    } else {
+      setExpandedNews(index); // 펼치기
+    }
+  };
+
   return (
     <Section>
       <div className="tabs">
         <button className={activeTab === "spec" ? "active" : ""} onClick={() => setActiveTab("spec")}>합격 스펙</button>
-        <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>트렌드</button>
+        <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>최신 기사</button>
         <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>멘토링 매칭</button>
       </div>
 
       <div className="content">
+
         {activeTab === "spec" && (
           <div className="list">
             <p className="spec-label">합격자 스펙 요약</p>
@@ -84,12 +97,25 @@ export default function CareerInsightsCard() {
         {activeTab === "news" && (
           <div className="news-list">
             {news.map((item, index) => (
-              <div className="news-card" key={index}>
-                <div className="news-header">
-                  <h4>{item.title}</h4>
-                  <span className="source">{item.source}</span>
+              <div
+                className={`news-card ${expandedNews === index ? "expanded" : ""}`}
+                key={index}
+                onClick={() => toggleNews(index)}
+              >
+                <div className="news-title-row">
+                  <div className="news-title">{item.title}</div>
+                  <div className="news-toggle-icon">
+                    {expandedNews === index ? <FaMinus /> : <FaPlus />}
+                  </div>
                 </div>
-                <p className="summary">{item.summary}</p>
+
+
+                {expandedNews === index && (
+                  <div className="news-details">
+                    <div className="news-source">{item.source}</div>
+                    <div className="news-summary">{item.summary}</div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -107,8 +133,6 @@ export default function CareerInsightsCard() {
                 />
               </div>
 
-              
-
               <div className="mentor-info">
                 <p><FaBuilding /><strong>기업:</strong> {currentMentor.field}</p>
                 <p><FaBriefcase /> <strong>직무:</strong> {currentMentor.job}</p>
@@ -123,6 +147,7 @@ export default function CareerInsightsCard() {
             </div>
           </>
         )}
+
       </div>
     </Section>
   );
@@ -180,13 +205,129 @@ const Section = styled.section`
   .content {
     flex: 1;
     padding-right: 0.5rem;
-    overflow: hidden; /* 스크롤 없애기 */
+    overflow: hidden;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: #ffc107;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+  }
+
+  .item {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    line-height: 1.3;
+
+    .icon {
+      font-size: 1.4rem;
+      margin-top: 0.2rem;
+      color: #00e676;
+    }
+
+    .post {
+      .company {
+        font-size: 0.85rem;
+        color: #4da6ff;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+
+      .spec-content {
+        font-size: 0.9rem;
+        color: #ccc;
+      }
+    }
+  }
+
+  .news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    max-height: 18rem;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #1e1e1e;
+    }
+  }
+
+  .news-card {
+    background-color: #2a2a2a;
+    padding: 1rem 1.2rem;
+    border-radius: 0.8rem;
+    border-left: 5px solid #ffc107;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #333;
+    }
+
+    .news-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .news-details {
+      margin-top: 0.5rem;
+      transition: max-height 0.3s ease;
+    }
+
+    .news-source {
+      font-size: 0.8rem;
+      color: #ffc107;
+      margin-bottom: 0.3rem;
+    }
+
+    .news-summary {
+      font-size: 0.9rem;
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    .news-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .news-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .news-toggle-icon {
+    font-size: 0.9rem;
+    color: #ffc107;
+  }
+}
+
   }
 
   .mentor-title {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #fff; /* 흰색으로 */
+    color: #fff;
     margin-bottom: 0.5rem;
     padding-left: 0.3rem;
   }
@@ -198,7 +339,7 @@ const Section = styled.section`
     background-color: #2a2a2a;
     padding: 1rem;
     border-radius: 0.6rem;
-    border-left: 4px solid #ffc107; /* 은은한 파랑 계열로 변경 */
+    border-left: 4px solid #ffc107;
     color: #ccc;
 
     .mentor-header {
@@ -214,7 +355,7 @@ const Section = styled.section`
 
       .refresh-icon {
         font-size: 1.2rem;
-        color:rgb(249, 248, 244); /* 동일한 파랑 */
+        color: #f9f8f4;
         cursor: pointer;
         transition: transform 0.5s ease;
 
@@ -225,14 +366,6 @@ const Section = styled.section`
         &:hover {
           color: #ffc107;
         }
-      }
-    }
-
-    .mentor-field {
-      p {
-        font-size: 0.9rem;
-        color: #eee;
-        margin: 0;
       }
     }
 
@@ -249,7 +382,7 @@ const Section = styled.section`
         color: #ccc;
 
         svg {
-          color: #ccc; /* 아이콘도 글자와 통일 */
+          color: #ccc;
         }
       }
     }
@@ -259,28 +392,11 @@ const Section = styled.section`
       flex-direction: column;
       gap: 0.5rem;
 
-      .mentor-btn {
-        background-color:rgb(97, 97, 95);
-        color: white;
-        font-weight: bold;
-        border: none;
-        border-radius: 0.5rem;
-        
-        padding: 0.6rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-
-        &:hover {
-          background-color: #ffc107;
-          color: black;
-        }
-      }
-
+      .mentor-btn,
       .mentor-appoint-btn {
         background-color: rgb(97, 97, 95);
         color: white;
         font-weight: bold;
-        
         border-radius: 0.5rem;
         padding: 0.6rem;
         cursor: pointer;

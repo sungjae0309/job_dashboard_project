@@ -26,10 +26,10 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
           <span>내 프로필</span>
         </a>
 
-        <a href="#" data-label="공고 검색" isOpen={isOpen}>
+        <Link to="/Searchjob" data-label="공고 검색" isOpen={isOpen}>
           <FaSearch />
-          <span>공고 검색</span>
-        </a>
+          <span>공고 보기</span>
+        </Link>
       
         <Link to="/saved-jobs" data-label="찜 한 채용공고" isOpen={isOpen}
         >

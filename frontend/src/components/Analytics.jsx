@@ -140,7 +140,7 @@ export default function Analytics() {
           <button className="mentor-toggle-btn" onClick={() => setShowMentor(false)}>
             돌아가기
           </button>
-        </div>
+          </div>
       )}
     </Section>
   );
