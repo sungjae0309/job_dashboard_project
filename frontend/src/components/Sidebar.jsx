@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
         <Link to="/saved-jobs" data-label="찜 한 채용공고" isOpen={isOpen}
         >
           <FaHeart />
-          <span>즐겨찾기</span>
+          <span>찜하기</span>
         </Link>
         <Link to="/community" data-label="커뮤니티" isOpen={isOpen}>
           <FaRegComments />
