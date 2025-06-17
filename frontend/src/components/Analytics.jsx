@@ -3,14 +3,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { cardStyles } from "./ReusableStyles";
 import AIJobModal from "./AIJobModal";
-import {
-  FaMapMarkerAlt,
-  FaCoins,
-  FaHeart,
-  FaRegHeart,
-  FaThumbsUp,
-  FaLink,
-} from "react-icons/fa";
+import { FaMapMarkerAlt, FaCoins, FaHeart, FaRegHeart, FaThumbsUp, FaLink } from "react-icons/fa";
 import { PiTargetDuotone } from "react-icons/pi";
 import { useLikedJobs } from "../contexts/LikedJobsContext";
 
@@ -44,9 +37,7 @@ export default function Analytics() {
 
   return (
     <Section>
-      {showModal && (
-        <AIJobModal jobPosts={jobPosts} onClose={() => setShowModal(false)} />
-      )}
+      {showModal && <AIJobModal jobPosts={jobPosts} onClose={() => setShowModal(false)} />}
 
       <div className="ai-box open full-width">
         <div className="ai-header">
@@ -63,12 +54,10 @@ export default function Analytics() {
 
             <div className="position-info">
               <p className="title">
-                {jobPosts[currentJobIndex].job_title} /{" "}
-                {jobPosts[currentJobIndex].experience_level}
+                {jobPosts[currentJobIndex].job_title} / {jobPosts[currentJobIndex].experience_level}
               </p>
               <p className="location-type">
-                {jobPosts[currentJobIndex].location} |{" "}
-                {jobPosts[currentJobIndex].employment_type}
+                {jobPosts[currentJobIndex].location} | {jobPosts[currentJobIndex].employment_type}
               </p>
               <span className="deadline highlight">⏱ 마감 D-3</span>
             </div>
@@ -98,22 +87,13 @@ export default function Analytics() {
 
             <div className="interaction-row">
               <div
-                className="like-button"
+                className={`like-button ${likedJobs.some((j) => j.id === jobPosts[currentJobIndex].id) ? "liked" : ""}`}
                 onClick={() => toggleLike(jobPosts[currentJobIndex])}
               >
-                {likedJobs.some(
-                  (j) => j.id === jobPosts[currentJobIndex].id
-                ) ? (
-                  <FaHeart />
-                ) : (
-                  <FaRegHeart />
-                )}
+                {likedJobs.some((j) => j.id === jobPosts[currentJobIndex].id) ? <FaHeart /> : <FaRegHeart />}
                 <span>찜하기</span>
               </div>
-              <div
-                className="reason-button"
-                onClick={() => setShowChatbot(true)}
-              >
+              <div className="reason-button" onClick={() => setShowChatbot(true)}>
                 <FaThumbsUp />
                 <span>추천 이유</span>
               </div>
@@ -198,12 +178,10 @@ const Section = styled.section`
         justify-content: center;
         align-items: center;
 
-        .company-name {
-          h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin: 0;
-          }
+        .company-name h3 {
+          font-size: 1.2rem;
+          font-weight: 700;
+          margin: 0;
         }
       }
 
@@ -224,7 +202,7 @@ const Section = styled.section`
 
         .deadline {
           display: block;
-          color:rgb(255, 158, 158);
+          color: #ff2d2d;
           font-size: 1.2rem;
           font-weight: bold;
         }
@@ -237,7 +215,7 @@ const Section = styled.section`
         margin-top: 0.5rem;
       }
 
-       .extras-wrapper {
+      .extras-wrapper {
         .extras {
           display: flex;
           flex-direction: column;
@@ -288,8 +266,6 @@ const Section = styled.section`
         }
       }
 
-
-
       .interaction-row {
         display: flex;
         justify-content: space-around;
@@ -305,6 +281,10 @@ const Section = styled.section`
           font-weight: bold;
           cursor: pointer;
           color: #ccc;
+        }
+
+        .like-button.liked {
+          color: #ff4d4d;
         }
 
         .like-button:hover {
@@ -357,4 +337,4 @@ const Section = styled.section`
       }
     }
   }
-`;
+` 
