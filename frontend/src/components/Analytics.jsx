@@ -142,126 +142,105 @@ const Section = styled.section`
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
+    justify-content: space-between;
     box-shadow: 0 0 12px rgba(255, 193, 7, 0.15);
 
     .ai-header {
-      width: 100%;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      margin-bottom: -0.2rem;
+      width: 100%;
+      margin-bottom: 0.4rem;
 
       h5 {
-        font-size: 1.4rem;
-        font-weight: bold;
+        font-size: 1.3rem;
+        font-weight: 700;
         color: #ffc107;
-        margin: 0;
       }
     }
 
     .job-card {
-      background-color:rgb(46, 45, 45);
-      padding: 1rem;
+      background-color:rgb(165, 159, 163);
+      border: 1px solid #2c2c2c;
       border-radius: 1rem;
+      padding: 1rem;
       width: 100%;
-      text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
-      box-shadow: inset 0 0 0 1px #444;
-      position: relative;
+      gap: 0.9rem;
 
-      .top-info {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .company-name h3 {
-          font-size: 1.2rem;
-          font-weight: 700;
-          margin: 0;
-        }
+      .company-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #000;
+        text-align: center;
       }
 
       .position-info {
-        margin-top: 0.2rem;
+        text-align: center;
+        line-height: 1.3;
 
         .title {
-          font-size: 1rem;
-          font-weight: 600;
-          margin: 0.1rem 0;
+          font-size: 0.95rem;
+          font-weight: 500;
+          color: #000;
         }
 
         .location-type {
-          font-size: 0.85rem;
-          color: #bbb;
-          margin-bottom: 0.2rem;
+          font-size: 0.8rem;
+          color: #444;
         }
 
         .deadline {
-          display: block;
-          color: #ff2d2d;
-          font-size: 1.2rem;
+          display: inline-block;
+          color: #ff5e5e;
           font-weight: bold;
+          font-size: 1.1rem;
+          margin-top: 0.3rem;
         }
       }
 
       .slogan {
-        font-style: italic;
         font-size: 0.8rem;
-        color: #ccc;
-        margin-top: 0.5rem;
+        color: #555;
+        font-style: italic;
+        text-align: center;
       }
 
-      .extras-wrapper {
-        .extras {
+      .extras {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.6rem;
+
+        .extra-box {
+          flex: 1;
+          background-color: #2b2b2b;
+          padding: 0.5rem;
+          border-radius: 0.6rem;
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
-          font-size: 0.85rem;
+          align-items: center;
+          font-size: 0.8rem;
+          gap: 0.2rem;
 
-          .extra-box {
-            background-color: #3a3a3a;
-            padding: 0.4rem 0.6rem;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.4rem;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+          .icon {
+            font-size: 1.2rem;
+            color: #ffc107;
+          }
 
-            .icon {
-              font-size: 1.1rem;
-              color: #aaa;
-              transition: color 0.3s ease;
-            }
+          .highlight {
+            color: #fff;
+            font-weight: bold;
+          }
 
-            .highlight {
-              color: #ffffff;
-              font-weight: bold;
-            }
+          .value {
+            color: #eee;
+            font-weight: 500;
+          }
 
-            .value {
-              color: #fff;
-              font-weight: 600;
-            }
-
-            .sub-info {
-              font-size: 0.75rem;
-              color: #ffffff;
-              margin-left: 0.1rem;
-            }
-
-            &:hover {
-              background-color: rgb(31, 174, 252);
-              transform: scale(1.03);
-
-              .icon {
-                color: #ffffff;
-              }
-            }
+          .sub-info {
+            font-size: 0.7rem;
+            color: #999;
           }
         }
       }
@@ -269,18 +248,19 @@ const Section = styled.section`
       .interaction-row {
         display: flex;
         justify-content: space-around;
-        margin-top: 0.8rem;
+        margin-top: 1rem;
 
         .like-button,
         .reason-button,
         .link-button {
           display: flex;
           align-items: center;
-          gap: 0.3rem;
-          font-size: 0.85rem;
-          font-weight: bold;
+          gap: 0.4rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #000;
           cursor: pointer;
-          color: #ccc;
+          text-decoration: none;
         }
 
         .like-button.liked {
@@ -295,10 +275,6 @@ const Section = styled.section`
           color: #81c784;
         }
 
-        .link-button {
-          text-decoration: none;
-        }
-
         .link-button:hover {
           color: #64b5f6;
         }
@@ -308,33 +284,29 @@ const Section = styled.section`
     .button-row {
       display: flex;
       gap: 0.8rem;
+      margin-top: 0.8rem;
 
       button {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
+        flex: 1;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
         font-weight: bold;
         border: none;
         border-radius: 0.5rem;
         cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      .mentor-toggle-btn {
-        background-color: #ffc107;
-        color: black;
-
-        &:hover {
-          background-color: #e0a800;
-        }
-      }
-
+      .mentor-toggle-btn,
       .more-btn {
         background-color: #444;
-        color: white;
+        color: #fff;
 
         &:hover {
-          background-color: #666;
+          background-color: #ffc107;
+          color: #000;
         }
       }
     }
   }
-` 
+`;

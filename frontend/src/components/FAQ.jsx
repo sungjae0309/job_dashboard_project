@@ -32,7 +32,7 @@ export default function ChallengeRoadmap() {
 
   return (
     <Wrapper>
-      <h3>취업 로드맵</h3>
+      <h3>To-do List</h3>
       <p className="subtext">🎯 목표 직무: 프론트엔드 개발자 · ⏱ D-5</p>
       <ChallengeList>
         {challenges.map((item, idx) => (
