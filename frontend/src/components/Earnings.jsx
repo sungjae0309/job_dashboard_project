@@ -1,190 +1,140 @@
-// 기업 비교 대시보드 - 피파 스타일
 import React, { useState } from "react";
 import styled from "styled-components";
+import { IoIosArrowForward } from "react-icons/io";
+import { FaLanguage, FaUserCheck, FaGraduationCap, FaBriefcase } from "react-icons/fa";
+import { MdRecommend } from "react-icons/md";
+import { BiCategoryAlt } from "react-icons/bi";
+import { IoIosRocket } from "react-icons/io";
+import { RiTeamLine } from "react-icons/ri";
 import { cardStyles } from "./ReusableStyles";
 
-export default function CompanyComparisonDashboard() {
-  const [selectedCompanies, setSelectedCompanies] = useState([]);
+export default function FAQ() {
+  const [selectedTab, setSelectedTab] = useState("분석");
 
-  const companyData = [
-    {
-      name: "우아한형제들",
-      salary: 4800,
-      benefits: ["유연 근무제", "점심 식사 제공", "자기계발비"],
-    },
-    {
-      name: "네이버",
-      salary: 5300,
-      benefits: ["재택 근무 지원", "스톡옵션", "매칭률"],
-    },
-    {
-      name: "카카오",
-      salary: 5100,
-      benefits: ["최신 장비 지원", "성과급 지급", "헬스케어 지원"],
-    },
-    {
-      name: "라인",
-      salary: 4900,
-      benefits: ["워케이션 제도", "디자인 교육비", "출근 자유"],
-    },
+  const analysisFaqs = [
+    { icon: <FaLanguage />, text: "[어학] 평균보다 20점 높아요" },
+    { icon: <FaUserCheck />, text: "[자격증] 평균보다 2개를 더 보유하고 있어요" },
+    { icon: <FaGraduationCap />, text: "[학점] 평균보다 다소 낮아요" },
+    { icon: <MdRecommend />, text: "[개선] 학점을 더 개선하셔야 해요" },
   ];
 
-  const toggleCompany = (companyName) => {
-    setSelectedCompanies((prev) => {
-      if (prev.includes(companyName)) {
-        return prev.filter((name) => name !== companyName);
-      } else if (prev.length < 2) {
-        return [...prev, companyName];
-      } else {
-        return prev;
-      }
-    });
-  };
+  const diagnosisFaqs = [
+    { icon: <BiCategoryAlt />, text: "[분야] 스펙에 적합한 분야는 DB 구축이에요." },
+    { icon: <FaBriefcase />, text: "[직무] 스펙에 적합한 직무는 데이터 분석가에요" },
+    { icon: <RiTeamLine />, text: "[사례] 현재 스펙과 가장 유사한 합격 사례로 3건이 있어요." },
+    { icon: <IoIosRocket />, text: "[확장] 글로벌 직무에도 충분히 도전 가능해요." },
+  ];
 
-  const selectedData = companyData.filter((company) =>
-    selectedCompanies.includes(company.name)
-  );
-
-  const getCommonStats = () => {
-    if (selectedData.length !== 2) return null;
-    const [a, b] = selectedData;
-    const benefitSet = new Set([...a.benefits, ...b.benefits]);
-    return {
-      salary: [a.salary, b.salary],
-      benefits: Array.from(benefitSet),
-    };
-  };
-
-  const stats = getCommonStats();
+  const currentFaqs = selectedTab === "분석" ? analysisFaqs : diagnosisFaqs;
 
   return (
     <Section>
-      <div className="header">
-        <h3>공고 비교</h3>
-        <p>두 개의 회사를 선택하여 비교해보세요</p>
-      </div>
+      <Header>
+        <TabButton
+          className={selectedTab === "분석" ? "active" : ""}
+          onClick={() => setSelectedTab("분석")}
+        >
+          분석
+        </TabButton>
+        <TabButton
+          className={selectedTab === "추천" ? "active" : ""}
+          onClick={() => setSelectedTab("추천")}
+        >
+          추천
+        </TabButton>
+      </Header>
 
-      <CompanySelect>
-        {companyData.map((company) => (
-          <button
-            key={company.name}
-            className={selectedCompanies.includes(company.name) ? "active" : ""}
-            onClick={() => toggleCompany(company.name)}
-          >
-            {company.name}
-          </button>
+      <FaqList>
+        {currentFaqs.map((faq, index) => (
+          <FaqItem key={index}>
+            <Info>
+              <IconWrapper>{faq.icon}</IconWrapper>
+              <span>{faq.text}</span>
+            </Info>
+            <IoIosArrowForward />
+          </FaqItem>
         ))}
-      </CompanySelect>
-
-      {stats && (
-        <ComparisonGrid>
-          <StatColumn align="right">
-            <h4>{selectedData[0].name}</h4>
-            <Stat>{selectedData[0].salary}만원</Stat>
-            {stats.benefits.map((b, i) => (
-              <Stat key={i} highlight={selectedData[0].benefits.includes(b)}>
-                {selectedData[0].benefits.includes(b) ? "✓" : "-"}
-              </Stat>
-            ))}
-          </StatColumn>
-
-          <CenterColumn>
-            <h4>스탯</h4>
-            <Stat>연봉</Stat>
-            {stats.benefits.map((b, i) => (
-              <Stat key={i}>{b}</Stat>
-            ))}
-          </CenterColumn>
-
-          <StatColumn align="left">
-            <h4>{selectedData[1].name}</h4>
-            <Stat>{selectedData[1].salary}만원</Stat>
-            {stats.benefits.map((b, i) => (
-              <Stat key={i} highlight={selectedData[1].benefits.includes(b)}>
-                {selectedData[1].benefits.includes(b) ? "✓" : "-"}
-              </Stat>
-            ))}
-          </StatColumn>
-        </ComparisonGrid>
-      )}
+      </FaqList>
     </Section>
   );
 }
 
 const Section = styled.section`
   ${cardStyles};
+  height: 100%;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
-
-  .header {
-    h3 {
-      color: #ffc107;
-      font-size: 1.2rem;
-    }
-    p {
-      font-size: 0.9rem;
-      color: #ccc;
-    }
-  }
 `;
 
-const CompanySelect = styled.div`
+const Header = styled.div`
   display: flex;
-  gap: 0.5rem;
+  background-color: #333;
+  border-radius: 10px;
+  overflow: hidden;
   margin-bottom: 1rem;
+`;
 
-  button {
-    flex: 1;
-    padding: 0.6rem 1rem;
-    background: #2b2b2b;
-    color: #ccc;
-    border: none;
-    border-radius: 2rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+const TabButton = styled.button`
+  flex: 1;
+  padding: 0.4rem 0;            // ✅ 세로 패딩 줄임
+  height: 1.9rem;               // ✅ 세로 높이 줄여서 스크롤 제거
+  background-color: #444;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
 
-    &.active {
-      background-color: #ffc107;
-      color: black;
-    }
+  &.active {
+    background-color: #ffc107;
+    color: black;
+  }
+
+  &:hover {
+    background-color: #ffc107;
+    color: black;
+  }
+
+  &:not(:last-child) {
+    border-right: 2px solid #666;
   }
 `;
 
-const ComparisonGrid = styled.div`
+
+const FaqList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const FaqItem = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  text-align: center;
-  padding-top: 1rem;
-  flex-wrap: wrap;
-`;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  border-bottom: 1px solid #555;
 
-const StatColumn = styled.div`
-  flex: 1;
-  text-align: ${(props) => props.align};
-
-  h4 {
-    color: #47a3ff;
-    margin-bottom: 1rem;
+  svg {
+    font-size: 1.8rem;
+    color: #aaa;
   }
 `;
 
-const CenterColumn = styled.div`
-  flex: 1;
+const Info = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 
-  h4 {
-    color: #ffc107;
-    margin-bottom: 1rem;
+  span {
+    font-size: 0.85rem;
+    font-weight: 400;
   }
 `;
 
-
-const Stat = styled.div`
-  margin: 0.4rem 0;
-  font-size: 0.95rem;
-  color: ${(props) => (props.highlight ? "#4caf50" : "#ccc")};
-  font-weight: ${(props) => (props.highlight ? "bold" : "normal")};
+const IconWrapper = styled.div`
+  svg {
+    font-size: 1.8rem;
+    color: white; // ✅ 모든 아이콘 색 흰색으로 통일
+  }
 `;

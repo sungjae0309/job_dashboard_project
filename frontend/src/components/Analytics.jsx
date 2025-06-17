@@ -162,7 +162,7 @@ const Section = styled.section`
     }
 
     .job-card {
-      background-color: #2a2a2a;
+      background-color:rgb(46, 45, 45);
       padding: 1rem;
       border-radius: 1rem;
       width: 100%;
