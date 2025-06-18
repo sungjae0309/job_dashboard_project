@@ -21,10 +21,12 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
           <MdSpaceDashboard />
           <span>홈 화면</span>
         </Link>
-        <a href="#" data-label="내 정보 수정" isOpen={isOpen}>
+
+        <Link to="/MyProfile" data-label="내 프로필" isOpen={isOpen}>
           <FiUser />
           <span>내 프로필</span>
-        </a>
+        </Link>
+
 
         <Link to="/Searchjob" data-label="공고 검색" isOpen={isOpen}>
           <FaSearch />

@@ -59,10 +59,11 @@ export default function Analytics() {
               <p className="location-type">
                 {jobPosts[currentJobIndex].location} | {jobPosts[currentJobIndex].employment_type}
               </p>
+              <br></br><p className="slogan">“문 앞으로 일상의 행복을 배달합니다”</p>
               <span className="deadline highlight">⏱ 마감 D-3</span>
             </div>
 
-            <p className="slogan">“문 앞으로 일상의 행복을 배달합니다”</p>
+            
 
             <div className="extras-wrapper visible">
               <div className="extras">
@@ -160,7 +161,7 @@ const Section = styled.section`
     }
 
     .job-card {
-      background-color:rgb(165, 159, 163);
+      background-color:rgb(70, 68, 69);
       border: 1px solid #2c2c2c;
       border-radius: 1rem;
       padding: 1rem;
@@ -172,7 +173,7 @@ const Section = styled.section`
       .company-name {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #000;
+        color: #white;
         text-align: center;
       }
 
@@ -183,17 +184,17 @@ const Section = styled.section`
         .title {
           font-size: 0.95rem;
           font-weight: 500;
-          color: #000;
+          color: white;
         }
 
         .location-type {
           font-size: 0.8rem;
-          color: #444;
+          color: white;
         }
 
         .deadline {
           display: inline-block;
-          color: #ff5e5e;
+          color:rgb(254, 46, 77);
           font-weight: bold;
           font-size: 1.1rem;
           margin-top: 0.3rem;
@@ -202,7 +203,7 @@ const Section = styled.section`
 
       .slogan {
         font-size: 0.8rem;
-        color: #555;
+        color:rgb(207, 198, 198);
         font-style: italic;
         text-align: center;
       }
@@ -258,7 +259,7 @@ const Section = styled.section`
           gap: 0.4rem;
           font-size: 0.8rem;
           font-weight: 600;
-          color: #000;
+          color: white;
           cursor: pointer;
           text-decoration: none;
         }

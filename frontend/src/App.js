@@ -11,7 +11,7 @@ import SavedJobs from "./components/SavedJobs";
 import { LikedJobsProvider } from "./contexts/LikedJobsContext";
 import Community from "./components/community";
 import Searchjob from "./components/Searchjob";
-
+import MyProfile from "./components/MyProfile";
 
 
 
@@ -31,6 +31,7 @@ export default function App() {
         <Route path="/saved-jobs" element={<SavedJobs />} />
         <Route path="/community" element={<Community />} />
         <Route path="/searchjob" element={<Searchjob />} />
+        <Route path="/myprofile" element={<MyProfile />} />
       </Routes>
     </Router>
     </LikedJobsProvider>
