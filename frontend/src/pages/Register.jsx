@@ -85,6 +85,31 @@ export default function Register() {
     }
   };
 
+  const handleAddCustomJob = () => {
+    const job = customJob.trim();
+    if (job && !selectedJobs.includes(job)) {
+      setSelectedJobs([...selectedJobs, job]);
+      setCustomJob(""); // 입력칸 비움
+    }
+  };
+  
+
+  // 기타 언어 추가 함수
+const handleAddOtherLanguage = () => {
+  const val = selectedSkills.otherLanguage.trim();
+  if (
+    val &&
+    !selectedSkills["언어"].includes(val)
+  ) {
+    setSelectedSkills(prev => ({
+      ...prev,
+      언어: [...prev.언어, val],
+      otherLanguage: "",
+    }));
+  }
+};
+
+
   // 이메일 도메인 자동완성 클릭
   const handleEmailSuggestionClick = (suggestion) => {
     setUser(prev => ({ ...prev, email: suggestion }));
@@ -127,11 +152,25 @@ export default function Register() {
     setSelectedJobs(prev => prev.filter(j => j !== job));
 
 
+
+  const [isFolded, setIsFolded] = useState({
+    언어: false,
+    프레임워크: false,
+    협업툴: false,
+  });
+  
   const [skillLevel, setSkillLevel] = useState({
     언어: 0,
     프레임워크: 0,
     협업툴: 0,
   });
+
+  const [skillLevels, setSkillLevels] = useState({
+    언어: {},
+    프레임워크: {},
+    협업툴: {},
+  });
+  
   const [skillKeywords, setSkillKeywords] = useState({
     언어: [],
     프레임워크: [],
@@ -435,57 +474,152 @@ export default function Register() {
               {selectedJobs.length > 0 &&
                 <TagWrap>
                   {selectedJobs.map(job => (
-                    <Tag key={job} onClick={() => removeJob(job)}>{job} ×</Tag>
+                    <Tag key={job} onClick={() => removeJob(job)}>{job} ×
+                    </Tag>
                   ))}
                 </TagWrap>
               }
               {/* 기타 */}
-              <Input
-                type="text"
-                placeholder="기타 자유롭게 작성"
-                value={customJob}
-                onChange={e => setCustomJob(e.target.value)}
-                style={{ marginTop: "1rem", width: "100%" }}
-              />
+              {/* 기타 입력 + 완료 버튼 */}
+
+
+              {/* 기타 입력 + 완료 버튼 */}
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+                <Input
+                  type="text"
+                  placeholder="기타 자유롭게 작성"
+                  value={customJob}
+                  onChange={e => setCustomJob(e.target.value)}
+                  style={{
+                   
+                    width: "100%",
+                    border: "1px solid #ffc107" // 여기만 테두리 컬러 추가!
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomJob();
+                    }
+                  }}
+                />
+                <AddJobBtn
+                  type="button"
+                  onClick={handleAddCustomJob}
+                  disabled={!customJob.trim() || selectedJobs.includes(customJob.trim())}
+                >
+                  완료
+                </AddJobBtn>
+              </div>
+
+
+
             </DropdownCard>
           </Section>
 
 
           {/* --- 기술스택 (새 컨셉: 카드형/태그형) --- */}
+          {/* --- 기술스택 (카드형/태그형) --- */}
           <Section>
             <SectionTitle>기술 스택</SectionTitle>
             <SkillCardWrap>
               {skillCategories.map(cat => (
                 <SkillCard key={cat.title}>
                   <SkillCatTitle>{cat.title}</SkillCatTitle>
-                  <SkillGrid>
-                    {cat.options.map(skill => (
-                      <SkillTag
-                        key={skill}
-                        selected={selectedSkills[cat.title] && selectedSkills[cat.title].includes(skill)}
-                        onClick={() => toggleSkill(cat.title, skill)}
+                  {!isFolded[cat.title] ? (
+                    <>
+                      <SkillGrid>
+                        {cat.options.map(skill => (
+                          <SkillTag
+                            key={skill}
+                            selected={selectedSkills[cat.title]?.includes(skill)}
+                            onClick={() => toggleSkill(cat.title, skill)}
+                          >
+                            {skill}
+                          </SkillTag>
+                        ))}
+                      </SkillGrid>
+                     
+                      <SkillEtcWrap>
+                        <SkillInput
+                          placeholder="기타 언어 입력"
+                          value={selectedSkills.otherLanguage}
+                          onChange={e => handleOtherSkillChange("otherLanguage", e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddOtherLanguage();
+                            }
+                          }}
+                        />
+                        <SkillEtcBtn
+                          type="button"
+                          disabled={
+                            !selectedSkills.otherLanguage?.trim() ||
+                            selectedSkills["언어"].includes(selectedSkills.otherLanguage.trim())
+                          }
+                          onClick={handleAddOtherLanguage}
+                        >
+                          추가
+                        </SkillEtcBtn>
+                      </SkillEtcWrap>
+
+                      {/* 선택 완료 버튼만 */}
+                      <SkillDoneBtn
+                        type="button"
+                        disabled={!selectedSkills[cat.title] || selectedSkills[cat.title].length === 0}
+                        onClick={() => setIsFolded(prev => ({ ...prev, [cat.title]: true }))}
                       >
-                        {skill}
-                      </SkillTag>
-                    ))}
-                  </SkillGrid>
-                  <SkillInput
-                    placeholder="기타 작성"
-                    value={selectedSkills[cat.otherKey]}
-                    onChange={e => handleOtherSkillChange(cat.otherKey, e.target.value)}
-                  />
-                  <TagWrap>
-                    {(selectedSkills[cat.title] || []).map(skill => (
-                      <Tag key={skill}>{skill}</Tag>
-                    ))}
-                    {selectedSkills[cat.otherKey] &&
-                      <Tag>{selectedSkills[cat.otherKey]}</Tag>
-                    }
-                  </TagWrap>
+                        선택 완료
+                      </SkillDoneBtn>
+                    </>
+                  ) : (
+                    // 숙련도 선택 화면
+                    <>
+                      <SkillLevelWrap>
+                        {(selectedSkills[cat.title] || []).map(skill => (
+                          <SkillWithLevel key={skill}>
+                          <LangTag>{skill}</LangTag>
+                          <LevelBtns>
+                            <LevelBtn
+                              selected={skillLevels[cat.title]?.[skill] === "상"}
+                              onClick={() => setSkillLevels(prev => ({
+                                ...prev, [cat.title]: { ...prev[cat.title], [skill]: "상" }
+                              }))}
+                            >상</LevelBtn>
+                            <LevelDivider />
+                            <LevelBtn
+                              selected={skillLevels[cat.title]?.[skill] === "중"}
+                              onClick={() => setSkillLevels(prev => ({
+                                ...prev, [cat.title]: { ...prev[cat.title], [skill]: "중" }
+                              }))}
+                            >중</LevelBtn>
+                            <LevelDivider />
+                            <LevelBtn
+                              selected={skillLevels[cat.title]?.[skill] === "하"}
+                              onClick={() => setSkillLevels(prev => ({
+                                ...prev, [cat.title]: { ...prev[cat.title], [skill]: "하" }
+                              }))}
+                            >하</LevelBtn>
+                          </LevelBtns>
+                        </SkillWithLevel>
+                        
+                        ))}
+                      </SkillLevelWrap>
+                      <SkillEditBtnWrap>
+                        <SkillEditBtn
+                          type="button"
+                          onClick={() => setIsFolded(prev => ({ ...prev, [cat.title]: false }))}
+                        >
+                          다시 선택
+                        </SkillEditBtn>
+                      </SkillEditBtnWrap>
+                    </>
+                  )}
                 </SkillCard>
               ))}
             </SkillCardWrap>
           </Section>
+
           <SubmitBtn type="submit">회원가입 완료</SubmitBtn>
         </FormContainer>
       </MainBox>
@@ -676,6 +810,7 @@ const Input = styled.input`
   &::placeholder { color: #aaa; }
 `;
 
+
 const RemoveBtn = styled.button`
   margin-left: 0.6rem;
   background: #eee;
@@ -686,24 +821,36 @@ const RemoveBtn = styled.button`
   font-weight: bold;
   font-size: 1.09rem;
   cursor: pointer;
-  height: 48px;  // 입력창과 같은 높이
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+  transition: background 0.18s, color 0.13s;
+
+  &:hover, &:focus {
+    background: #e53935;
+    color: #fff;
+  }
 `;
+
 
 
 const AddBtn = styled.button`
   margin-bottom: 0.5rem;
   background: #f5f5f5;
-  color: #555;
+  color:rgb(79, 152, 230);
   border: none;
   border-radius: 0.5rem;
-  padding: 0.7rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   font-weight: bold;
   cursor: pointer;
   font-size: 1rem;
+
+  &:hover, &:focus {
+    background:rgb(79, 152, 230);
+    color: #f5f5f5;
+  }
 `;
 
 const DropdownCard = styled.div`
@@ -758,6 +905,7 @@ const TagWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
+
 `;
 
 const Tag = styled.div`
@@ -786,13 +934,19 @@ const SkillCardWrap = styled.div`
   flex-direction: column;
   gap: 1.25rem;
 `;
+
 const SkillCard = styled.div`
   background: #222;
   border-radius: 1rem;
   padding: 1.05rem 1.2rem 0.9rem 1.2rem;
   margin-bottom: 0.3rem;
   box-shadow: 0 2px 9px 0 #0003;
+  display: flex;
+  flex-direction: column;
+  align-items: center;   // << 이 줄 추가!
+  justify-content: center;
 `;
+
 
 const SkillCatTitle = styled.div`
   color: #ffc107;
@@ -877,3 +1031,136 @@ const EmailDropdownItem = styled.div`
   &:hover { background: #222; }
 `;
 
+
+const AddJobBtn = styled.button`
+  background: #ffc107;
+  color:rgb(38, 38, 38);
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0 1.1rem;
+  cursor: pointer;
+  height: 48px;
+  
+  &:hover {
+    background:rgb(252, 211, 130);
+    color:rgb(44, 44, 43);
+  }
+`;
+
+
+const SkillWithLevel = styled.div`
+  display: flex;
+  align-items: center;
+  width: 80%;
+  justify-content: flex-start;
+  margin-top: 0.9rem;
+  margin-bottom: 0.1rem;
+`;
+
+const LangTag = styled.div`
+  min-width: 85px;
+  text-align: center;
+  font-size: 1.00rem;  // 언어명 글씨 크게!
+  font-weight: bold;
+
+  color: #ffc107;
+  border-radius: 1.7rem;
+  padding: 0.65rem 0;
+  margin-right: 1.2rem;
+`;
+
+const LevelBtns = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LevelBtn = styled.button`
+  background: ${({ selected }) => (selected ? "#ffc107" : "#444")};
+  color: ${({ selected }) => (selected ? "#232323" : "#fff")};
+  border: none;
+  border-radius: 0.33rem;
+  min-width: 54px;
+  min-height: 40px;
+  font-size: 1.07rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.13s;
+  &:hover { background: #ffc107; color: #232323; }
+  // 상중하 버튼끼리 바로 붙게 마진 없음
+`;
+
+const LevelDivider = styled.div`
+  width: 0.5px;
+  height: 40px;
+  background: #fff4;
+  margin: 0 0.2rem;
+  align-self: center;
+  border-radius: 3px;
+`;
+
+const SkillDoneBtn = styled.button`
+  
+  background: rgb(83, 83, 80);
+  color: #ffc107;
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+ &:hover { 
+      background: #ffc107; 
+      color: #232323; 
+      }
+`;
+
+const SkillEditBtn = styled(SkillDoneBtn)`
+  background: #444;
+  color: #ffc107;
+  margin-left: 1rem;
+  &:hover {
+    background: #ffc107;
+    color: #232323;
+  }
+`;
+
+const SkillEtcWrap = styled.div`
+  display: flex;
+  align-items: center;
+  width: 50%;
+  margin-bottom: 0.7rem;
+  gap: 1.5rem;
+`;
+
+
+const SkillLevelWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 2.2rem;
+`;
+
+
+const SkillEditBtnWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1.5rem;
+`;
+
+
+const SkillEtcBtn = styled.button`
+  background: #ffc107;
+  color: #1e1e1e;
+  border-radius: 1.2rem;
+  padding: 0.32rem 0.95rem 0.32rem 0.95rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.13s;
+  &:hover { background: #ffd955; }
+`;
