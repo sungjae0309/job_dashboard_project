@@ -1,13 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLikedJobs } from "../contexts/LikedJobsContext";
 import { FaHeart, FaLink } from "react-icons/fa";
-import { GiHamburgerMenu } from "react-icons/gi";
+
 import Sidebar from "./Sidebar";
+import axios from "axios";
+
+
 
 export default function SavedJobs() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { likedJobs, toggleLike } = useLikedJobs();
+  const [likedJobs, setLikedJobs] = useState([]);  // 서버에서 받아온 찜 리스트
+
+  // 서버에서 찜한 공고 불러오기 (최초 1회)
+  useEffect(() => {
+    axios
+      .get("http://192.168.101.36:8000/api/liked-jobs/") // ← FastAPI 엔드포인트 맞춰서 변경
+      .then((res) => setLikedJobs(res.data))
+      .catch(() => setLikedJobs([]));
+  }, []);
+
+  // 서버에 찜 취소 요청 (예시)
+  const handleUnlike = (jobId) => {
+    axios
+      .delete(`http://192.168.101.36:8000/api/liked-jobs/${jobId}/`)
+      .then(() => setLikedJobs((prev) => prev.filter((job) => job.id !== jobId)));
+  };
 
   return (
     <Container sidebarOpen={sidebarOpen}>
@@ -28,13 +45,11 @@ export default function SavedJobs() {
                   <p>{job.job_title} / {job.experience_level}</p>
                   <p>{job.location} | {job.employment_type}</p>
                 </div>
-
                 <div className="right-section">
-                  <button className="like-btn" onClick={() => toggleLike(job)}>
+                  <button className="like-btn" onClick={() => handleUnlike(job.id)}>
                     <FaHeart />
                     <span>찜 취소</span>
                   </button>
-
                   {job.link && (
                     <a
                       href={job.link}
@@ -55,6 +70,7 @@ export default function SavedJobs() {
     </Container>
   );
 }
+
 
 const Container = styled.div`
   display: flex;

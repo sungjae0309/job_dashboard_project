@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+
 import { IoIosArrowForward } from "react-icons/io";
 import { FaLanguage, FaUserCheck, FaGraduationCap, FaBriefcase } from "react-icons/fa";
 import { MdRecommend } from "react-icons/md";
@@ -7,25 +7,35 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { IoIosRocket } from "react-icons/io";
 import { RiTeamLine } from "react-icons/ri";
 import { cardStyles } from "./ReusableStyles";
+import axios from "axios";
+import styled from "styled-components";
+
+
+
+// 아이콘 매핑 (API에서 text에 "어학" 등 들어오면 icon 매칭)
+const iconMap = {
+  "어학": <FaLanguage />,
+  "자격증": <FaUserCheck />,
+  "학점": <FaGraduationCap />,
+  "나이": <MdRecommend />,
+  "분야": <BiCategoryAlt />,
+  "직무": <FaBriefcase />,
+  "사례": <RiTeamLine />,
+  "확장": <IoIosRocket />
+};
 
 export default function FAQ() {
   const [selectedTab, setSelectedTab] = useState("분석");
+  const [faqs, setFaqs] = useState([]);
 
-  const analysisFaqs = [
-    { icon: <FaLanguage />, text: "[어학] 평균보다 20점 높아요" },
-    { icon: <FaUserCheck />, text: "[자격증] 평균보다 2개를 더 보유하고 있어요" },
-    { icon: <FaGraduationCap />, text: "[학점] 평균보다 다소 낮아요" },
-    { icon: <MdRecommend />, text: "[개선] 학점을 더 개선하셔야 해요" },
-  ];
-
-  const diagnosisFaqs = [
-    { icon: <BiCategoryAlt />, text: "[분야] 스펙에 적합한 분야는 DB 구축이에요." },
-    { icon: <FaBriefcase />, text: "[직무] 스펙에 적합한 직무는 데이터 분석가에요" },
-    { icon: <RiTeamLine />, text: "[사례] 현재 스펙과 가장 유사한 합격 사례로 3건이 있어요." },
-    { icon: <IoIosRocket />, text: "[확장] 글로벌 직무에도 충분히 도전 가능해요." },
-  ];
-
-  const currentFaqs = selectedTab === "분석" ? analysisFaqs : diagnosisFaqs;
+  // 탭 바뀌면 FastAPI에서 FAQ 받아옴
+  useEffect(() => {
+    const type = selectedTab === "분석" ? "analysis" : "diagnosis";
+    axios
+      .get(`http://192.168.101.36:8000/api/faqs?type=${type}`)
+      .then(res => setFaqs(res.data))
+      .catch(() => setFaqs([]));
+  }, [selectedTab]);
 
   return (
     <Section>
@@ -45,10 +55,17 @@ export default function FAQ() {
       </Header>
 
       <FaqList>
-        {currentFaqs.map((faq, index) => (
+        {faqs.map((faq, index) => (
           <FaqItem key={index}>
             <Info>
-              <IconWrapper>{faq.icon}</IconWrapper>
+              <IconWrapper>
+                {/* API에서 text: "[어학] ..." 형식이면, [ ] 안의 단어 추출해서 아이콘 매칭 */}
+                {(() => {
+                  const m = faq.text?.match(/\[(.*?)\]/);
+                  const key = m ? m[1] : "";
+                  return iconMap[key] || <FaLanguage />;
+                })()}
+              </IconWrapper>
               <span>{faq.text}</span>
             </Info>
             <IoIosArrowForward />
@@ -58,6 +75,9 @@ export default function FAQ() {
     </Section>
   );
 }
+
+// --- 스타일 컴포넌트는 네가 원래 쓰던 그대로 아래에 두면 됨 ---
+
 
 const Section = styled.section`
   ${cardStyles};

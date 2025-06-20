@@ -8,13 +8,31 @@ import {
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useLikedJobs } from "../contexts/LikedJobsContext";
+import axios from "axios";
+
+
 
 export default function AIJobModal({ jobPosts, onClose }) {
   const { likedJobs, toggleLike } = useLikedJobs();
   const [showChatbot, setShowChatbot] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [reason, setReason] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleReasonClick = () => {
+  // "추천 이유" 누르면 해당 job에 맞는 이유 가져오기
+  const handleReasonClick = async (job) => {
+    setSelectedJob(job);
     setShowChatbot(true);
+    setLoading(true);
+    setReason(""); // 초기화
+    try {
+      // FastAPI 예시: /api/reason/{job_id}
+      const res = await axios.get(`http://192.168.101.36:8000/api/reason/${job.id}`);
+      setReason(res.data.reason || "추천 이유를 불러올 수 없습니다.");
+    } catch {
+      setReason("추천 이유를 불러올 수 없습니다.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -25,9 +43,8 @@ export default function AIJobModal({ jobPosts, onClose }) {
           <IoMdClose className="close-icon" onClick={onClose} />
         </Header>
 
-        {/* 공통 알고리즘 설명 */}
         <AlgorithmExplanation>
-        추천 공고는 사용자의 정보들을 바탕으로 AI가 분석하여 추천한 결과입니다.
+          추천 공고는 사용자의 정보들을 바탕으로 AI가 분석하여 추천한 결과입니다.
         </AlgorithmExplanation>
 
         <JobList>
@@ -51,7 +68,7 @@ export default function AIJobModal({ jobPosts, onClose }) {
 
                   <div
                     className="action-item reason"
-                    onClick={handleReasonClick}
+                    onClick={() => handleReasonClick(job)}
                   >
                     <FaThumbsUp />
                     <span>추천 이유</span>
@@ -80,14 +97,16 @@ export default function AIJobModal({ jobPosts, onClose }) {
               <button onClick={() => setShowChatbot(false)}>×</button>
             </div>
             <div className="chat-body">
-              <p>📌 <strong>추천 이유:</strong> 우아한형제들 프론트엔드 개발자 포지션은 React, JavaScript, HTML/CSS 등 웹 프론트엔드 기술에 능숙한 인재를 요구합니다.</p>
-              <p>사용자는 HTML/CSS, JavaScript, React, Node.js 등의 스택을 보유하고 있고, React 기반 포트폴리오 사이트와 Node.js + MongoDB 게시판 프로젝트 등의 실무형 경험을 보유하고 있어 기술적으로 적합합니다.</p>
-              <p>또한 GitHub에 3건 이상의 포트폴리오를 업로드하며 지속적인 개발 활동을 해왔고, IT 커뮤니티와 부트캠프 활동 경력도 있어 자기주도성과 커뮤니케이션 능력을 동시에 갖춘 인재로 평가됩니다.</p>
+              <p>📌 <strong>추천 이유:</strong></p>
+              {loading ? (
+                <p style={{ color: "#aaa" }}>불러오는 중...</p>
+              ) : (
+                <p>{reason}</p>
+              )}
             </div>
-
             <div className="chat-input">
-              <input type="text" placeholder="메시지를 입력하세요..." />
-              <button>전송</button>
+              <input type="text" placeholder="메시지를 입력하세요..." disabled />
+              <button disabled>전송</button>
             </div>
           </ChatbotPopup>
         )}
@@ -96,7 +115,7 @@ export default function AIJobModal({ jobPosts, onClose }) {
   );
 }
 
-
+// --- 스타일 컴포넌트는 기존 네가 쓰는 대로 별도 파일 or 이 아래 두면 됨 ---
 
 const ModalOverlay = styled.div`
   position: fixed;

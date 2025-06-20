@@ -1,10 +1,16 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "./Sidebar";
+import styled from "styled-components";
+
+
 import { FaAngleRight } from "react-icons/fa";
 
 const jobFields = ["프론트엔드", "백엔드", "데이터"];
 const communityTabs = ["경험공유", "스터디 모집"];
+
+// FastAPI 서버 IP
+const API_BASE = "http://192.168.101.36:8000/api/community";
 
 export default function Community() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -12,60 +18,68 @@ export default function Community() {
   const [selectedField, setSelectedField] = useState("프론트엔드");
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      job: "프론트엔드",
-      author: "익명 1",
-      content: "SQLD는 기출 위주로 풀었다",
-      comments: ["맞음 기출 중요"],
-    },
-    {
-      id: 2,
-      job: "프론트엔드",
-      author: "익명 2",
-      content: "FastAPI로 백엔드 만들면서 실력 쌓았음",
-      comments: [],
-    },
-  ]);
-
+  // 경험공유 & 스터디 글, 댓글 서버에서 받아오기
+  const [posts, setPosts] = useState([]);
   const [studyPosts, setStudyPosts] = useState([]);
+
+  // 새 글, 새 댓글 입력 state
   const [newPost, setNewPost] = useState("");
   const [showComments, setShowComments] = useState({});
-
+  const [commentInputs, setCommentInputs] = useState({});
   const [studyTitle, setStudyTitle] = useState("");
   const [studyDesc, setStudyDesc] = useState("");
   const [studyContact, setStudyContact] = useState("");
 
+  // 서버에서 경험공유 글/댓글 가져오기
+  const fetchExperiencePosts = async () => {
+    const res = await axios.get(`${API_BASE}/experience/`);
+    setPosts(res.data);
+  };
+
+  // 서버에서 스터디 모집글 가져오기
+  const fetchStudyPosts = async () => {
+    const res = await axios.get(`${API_BASE}/study/`);
+    setStudyPosts(res.data);
+  };
+
+  // 최초 렌더링 시 데이터 fetch
+  useEffect(() => {
+    fetchExperiencePosts();
+    fetchStudyPosts();
+  }, []);
+
+  // 검색 + 직무 필터링
   const filteredPosts = posts.filter(
     (post) =>
       post.job === selectedField &&
       post.content.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
-  const handlePost = () => {
+  // 경험 공유 새 글 등록 (POST)
+  const handlePost = async () => {
     if (!newPost.trim()) return;
-    const newEntry = {
-      id: posts.length + 1,
+    await axios.post(`${API_BASE}/experience/`, {
       job: selectedField,
-      author: `익명 ${posts.length + 1}`,
+      author: "익명",
       content: newPost.trim(),
-      comments: [],
-    };
-    setPosts([newEntry, ...posts]);
+    });
     setNewPost("");
+    fetchExperiencePosts(); // 새로고침
   };
 
-  const handleAddComment = (postId, text) => {
-    if (!text.trim()) return;
-    const updatedPosts = posts.map((post) =>
-      post.id === postId
-        ? { ...post, comments: [...post.comments, text] }
-        : post
-    );
-    setPosts(updatedPosts);
+  // 댓글 등록 (POST)
+  const handleAddComment = async (postId) => {
+    const text = commentInputs[postId];
+    if (!text || !text.trim()) return;
+    await axios.post(`${API_BASE}/comment/`, {
+      post_id: postId,
+      content: text.trim(),
+    });
+    setCommentInputs((inputs) => ({ ...inputs, [postId]: "" }));
+    fetchExperiencePosts(); // 새로고침
   };
 
+  // 댓글 토글
   const toggleComments = (postId) => {
     setShowComments((prev) => ({
       ...prev,
@@ -73,96 +87,97 @@ export default function Community() {
     }));
   };
 
-  const handleStudyPost = () => {
+  // 스터디 모집글 등록 (POST)
+  const handleStudyPost = async () => {
     if (!studyTitle.trim() || !studyDesc.trim() || !studyContact.trim()) return;
-    const newStudy = {
-      id: studyPosts.length + 1,
+    await axios.post(`${API_BASE}/study/`, {
       title: studyTitle,
       desc: studyDesc,
       contact: studyContact,
-    };
-    setStudyPosts([newStudy, ...studyPosts]);
-    setStudyTitle("");
-    setStudyDesc("");
-    setStudyContact("");
+    });
+    setStudyTitle(""); setStudyDesc(""); setStudyContact("");
+    fetchStudyPosts();
   };
 
   return (
-    <Container sidebarOpen={sidebarOpen}>
+    <div>
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       <div className="content">
-        <CommunityTabs>
+        <div>
           {communityTabs.map((tab) => (
-            <CommunityTab
+            <button
               key={tab}
-              active={activeTab === tab}
+              className={activeTab === tab ? "active" : ""}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
-            </CommunityTab>
+            </button>
           ))}
-        </CommunityTabs>
+        </div>
 
         {activeTab === "경험공유" && (
           <>
-            <JobTabs>
+            <div>
               {jobFields.map((field) => (
-                <JobTab
+                <button
                   key={field}
-                  active={selectedField === field}
+                  className={selectedField === field ? "active" : ""}
                   onClick={() => setSelectedField(field)}
                 >
                   {field}
-                </JobTab>
+                </button>
               ))}
-            </JobTabs>
+            </div>
 
-            <SearchBox>
-              <span role="img" aria-label="search">🔍</span>
+            <div>
               <input
                 type="text"
                 placeholder="키워드로 검색"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
               />
-            </SearchBox>
+            </div>
 
-            <PostList>
+            <div>
               {filteredPosts.map((post) => (
-                <Post key={post.id}>
-                  <Author>👤 {post.author}</Author>
-                  <Content>{post.content}</Content>
+                <div key={post.id} style={{ border: "1px solid #ccc", margin: "10px 0" }}>
+                  <div>👤 {post.author}</div>
+                  <div>{post.content}</div>
 
-                  {post.comments.length > 0 && (
-                    <CommentLink onClick={() => toggleComments(post.id)}>
+                  {post.comments && post.comments.length > 0 && (
+                    <button onClick={() => toggleComments(post.id)}>
                       댓글 {post.comments.length}개 {showComments[post.id] ? "숨기기" : "보기"}
-                    </CommentLink>
+                    </button>
                   )}
 
                   {showComments[post.id] && (
-                    <CommentsSection>
+                    <div>
                       {post.comments.map((cmt, idx) => (
-                        <Comment key={idx}>
-                          <FaAngleRight className="arrow" />
+                        <div key={idx}>
+                          <FaAngleRight />
                           <span>{cmt}</span>
-                        </Comment>
+                        </div>
                       ))}
-                      <CommentInput
+                      <input
                         placeholder="댓글 작성..."
+                        value={commentInputs[post.id] || ""}
+                        onChange={(e) =>
+                          setCommentInputs((inputs) => ({
+                            ...inputs,
+                            [post.id]: e.target.value,
+                          }))
+                        }
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleAddComment(post.id, e.target.value);
-                            e.target.value = "";
-                          }
+                          if (e.key === "Enter") handleAddComment(post.id);
                         }}
                       />
-                    </CommentsSection>
+                    </div>
                   )}
-                </Post>
+                </div>
               ))}
-            </PostList>
+            </div>
 
-            <InputArea>
+            <div>
               <input
                 type="text"
                 placeholder="공유하고 싶은 경험을 입력하세요..."
@@ -171,13 +186,13 @@ export default function Community() {
                 onKeyDown={(e) => e.key === "Enter" && handlePost()}
               />
               <button onClick={handlePost}>등록</button>
-            </InputArea>
+            </div>
           </>
         )}
 
         {activeTab === "스터디 모집" && (
           <>
-            <StudyInputArea>
+            <div>
               <input
                 type="text"
                 placeholder="스터디명 입력"
@@ -196,23 +211,24 @@ export default function Community() {
                 onChange={(e) => setStudyContact(e.target.value)}
               />
               <button onClick={handleStudyPost}>스터디 등록</button>
-            </StudyInputArea>
+            </div>
 
-            <PostList>
+            <div>
               {studyPosts.map((study) => (
-                <Post key={study.id}>
-                  <Author>📚 {study.title}</Author>
-                  <Content>{study.desc}</Content>
-                  <StudyContact>📞 {study.contact}</StudyContact>
-                </Post>
+                <div key={study.id} style={{ border: "1px solid #ccc", margin: "10px 0" }}>
+                  <div>📚 {study.title}</div>
+                  <div>{study.desc}</div>
+                  <div>📞 {study.contact}</div>
+                </div>
               ))}
-            </PostList>
+            </div>
           </>
         )}
       </div>
-    </Container>
+    </div>
   );
 }
+
 
 const Container = styled.div`
   display: flex;

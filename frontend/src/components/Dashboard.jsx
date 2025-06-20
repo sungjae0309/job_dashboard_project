@@ -8,6 +8,7 @@ import Profile from "./Profile";
 import Transfers from "./Transfers";
 import styled from "styled-components";
 
+
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showChatbot, setShowChatbot] = useState(false);

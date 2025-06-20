@@ -12,6 +12,8 @@ import { LikedJobsProvider } from "./contexts/LikedJobsContext";
 import Community from "./components/community";
 import Searchjob from "./components/Searchjob";
 import MyProfile from "./components/MyProfile";
+import Logout from "./components/logout";
+import RegisterNext from "./pages/RegisterNext";
 
 
 
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="/community" element={<Community />} />
         <Route path="/searchjob" element={<Searchjob />} />
         <Route path="/myprofile" element={<MyProfile />} />
+        <Route path="/logout" element={<Logout/>} />
+        <Route path="/registernext" element={<RegisterNext/>} />
       </Routes>
     </Router>
     </LikedJobsProvider>

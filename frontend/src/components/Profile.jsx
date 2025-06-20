@@ -1,99 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
-import { cardStyles } from "./ReusableStyles";
+
+import { cardStyles } from "./ReusableStyles"; // cardStyles 사용하는 
 import {
-  FaCheckCircle,
-  FaCertificate,
-  FaQuestionCircle,
-  FaUniversity,
-  FaBook,
-  FaBriefcase,
   FaSyncAlt,
   FaBuilding,
+  FaBriefcase,
+  FaUniversity,
+  FaBook,
   FaPlus,
-  FaMinus
+  FaMinus,
 } from "react-icons/fa";
+import axios from "axios";
 
 export default function CareerInsightsCard() {
-  const [activeTab, setActiveTab] = useState("spec");
+  const [activeTab, setActiveTab] = useState("news");
 
-  const specs = [
-    { company: "카카오", content: "토익 850, 컴활 1급, 개발 동아리 2년 활동" },
-    { company: "라인", content: "CS 전공자, 인턴 경험 1회, 코딩 테스트 3회 합격" },
-  ];
+  // 실제 API로부터 데이터 받아오는 state
+  const [news, setNews] = useState([]);
+  const [mentors, setMentors] = useState([]);
+  const [currentMentor, setCurrentMentor] = useState(null);
 
-  const news = [
-    {
-      title: "SQLD 자격 기준 변경",
-      source: "kdata.or.kr",
-      summary: "2024년부터 SQLD 시험은 일부 과목이 개편되어 출제 범위가 달라졌습니다."
-    },
-    {
-      title: "ChatGPT 자격증 출시",
-      source: "openai.com",
-      summary: "AI 활용 능력을 평가하는 새로운 자격 인증이 도입되었습니다."
-    },
-    {
-      title: "정보처리기사 CBT 전환",
-      source: "q-net.or.kr",
-      summary: "기존 필기시험이 컴퓨터 기반 테스트로 전면 전환됩니다."
-    }
-  ];
+  // 기사 리스트 받아오기
+  useEffect(() => {
+    axios
+      .get("http://192.168.101.36:8000/api/news/")
+      .then((res) => setNews(res.data))
+      .catch(() => setNews([]));
+  }, []);
 
-  const mentors = [
-    { field: "토스", school: "중앙대학교", major: "소프트웨어학부", job: "프론트엔드 개발자" },
-    { field: "우아한형제", school: "서울대학교", major: "통계학과", job: "데이터 분석가" },
-    { field: "당근마켓", school: "연세대학교", major: "컴퓨터공학과", job: "백엔드 개발자" },
-    { field: "AI", school: "KAIST", major: "AI학과", job: "AI 엔지니어" }
-  ];
+  // 멘토 리스트 받아오기
+  useEffect(() => {
+    axios
+      .get("http://192.168.101.36:8000/api/mentors/")
+      .then((res) => {
+        setMentors(res.data);
+        setCurrentMentor(res.data.length > 0 ? res.data[0] : null);
+      })
+      .catch(() => setMentors([]));
+  }, []);
 
-  const [currentMentor, setCurrentMentor] = useState(mentors[0]);
+  // 멘토 랜덤 매칭 (or 백엔드에서 랜덤 1명 API도 가능)
   const [isRotating, setIsRotating] = useState(false);
-
   const fetchMentor = () => {
     setIsRotating(true);
     setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * mentors.length);
-      setCurrentMentor(mentors[randomIndex]);
+      if (mentors.length > 0) {
+        const randomIndex = Math.floor(Math.random() * mentors.length);
+        setCurrentMentor(mentors[randomIndex]);
+      }
       setIsRotating(false);
     }, 500);
   };
 
+  // 기사 확장/접기
   const [expandedNews, setExpandedNews] = useState(null);
-
   const toggleNews = (index) => {
-    if (expandedNews === index) {
-      setExpandedNews(null); // 접기
-    } else {
-      setExpandedNews(index); // 펼치기
-    }
+    if (expandedNews === index) setExpandedNews(null);
+    else setExpandedNews(index);
   };
 
   return (
-    <Section>
+    <section>
       <div className="tabs">
-        <button className={activeTab === "spec" ? "active" : ""} onClick={() => setActiveTab("spec")}>합격 스펙</button>
-        <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>최신 기사</button>
-        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>멘토링 매칭</button>
+        <button className={activeTab === "news" ? "active" : ""} onClick={() => setActiveTab("news")}>
+          최신 기사
+        </button>
+        <button className={activeTab === "tip" ? "active" : ""} onClick={() => setActiveTab("tip")}>
+          멘토링 매칭
+        </button>
       </div>
 
       <div className="content">
-
-        {activeTab === "spec" && (
-          <div className="list">
-            <p className="spec-label">합격자 스펙 요약</p>
-            {specs.map((spec, index) => (
-              <div className="item" key={index}>
-                <FaCheckCircle className="icon green" />
-                <div className="post">
-                  <p className="company">최종 합격 기업: {spec.company}</p>
-                  <p className="spec-content">{spec.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
+        {/* 최신 기사 */}
         {activeTab === "news" && (
           <div className="news-list">
             {news.map((item, index) => (
@@ -108,8 +87,6 @@ export default function CareerInsightsCard() {
                     {expandedNews === index ? <FaMinus /> : <FaPlus />}
                   </div>
                 </div>
-
-
                 {expandedNews === index && (
                   <div className="news-details">
                     <div className="news-source">{item.source}</div>
@@ -121,6 +98,7 @@ export default function CareerInsightsCard() {
           </div>
         )}
 
+        {/* 멘토링 매칭 */}
         {activeTab === "tip" && (
           <>
             <h4 className="mentor-title">🎓 매칭 결과</h4>
@@ -134,10 +112,10 @@ export default function CareerInsightsCard() {
               </div>
 
               <div className="mentor-info">
-                <p><FaBuilding /><strong>기업:</strong> {currentMentor.field}</p>
-                <p><FaBriefcase /> <strong>직무:</strong> {currentMentor.job}</p>
-                <p><FaUniversity /> <strong>학교:</strong> {currentMentor.school}</p>
-                <p><FaBook /> <strong>전공:</strong> {currentMentor.major}</p>
+                <p><FaBuilding /><strong>기업:</strong> {currentMentor?.field || "-"}</p>
+                <p><FaBriefcase /> <strong>직무:</strong> {currentMentor?.job || "-"}</p>
+                <p><FaUniversity /> <strong>학교:</strong> {currentMentor?.school || "-"}</p>
+                <p><FaBook /> <strong>전공:</strong> {currentMentor?.major || "-"}</p>
               </div>
 
               <div className="mentor-actions">
@@ -147,11 +125,11 @@ export default function CareerInsightsCard() {
             </div>
           </>
         )}
-
       </div>
-    </Section>
+    </section>
   );
 }
+
 
 const rotate360 = keyframes`
   from {

@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Sidebar from "./Sidebar";
-import { cardStyles } from "./ReusableStyles";
+
+import axios from "axios";
+
 
 export default function Searchjob() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -15,19 +17,22 @@ export default function Searchjob() {
 
   const tabs = ["전체", "마감 임박", "최신 공고", "유행 공고"];
 
-  const jobs = [
-    { title: "프론트엔드 개발자", company: "우아한형제들", location: "서울", due: "2024-06-30", jobType: "프론트엔드" },
-    { title: "백엔드 개발자", company: "네이버", location: "판교", due: "2024-06-20", jobType: "백엔드" },
-    { title: "데이터 분석가", company: "카카오", location: "성남", due: "2024-06-15", jobType: "데이터" },
-    { title: "UX 디자이너", company: "라인", location: "서울", due: "2024-07-05", jobType: "디자인" },
-  ];
+  // FastAPI에서 공고 리스트 받아오기
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://192.168.101.36:8000/api/jobs/")
+      .then(res => setJobs(res.data))
+      .catch(() => setJobs([]));
+  }, []);
 
   const filteredJobs = jobs
     .filter((job) => {
       const matchesSearch =
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchTerm.toLowerCase());
+        (job.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.company || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.location || "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesJobType = selectedJobType ? job.jobType === selectedJobType : true;
       const matchesLocation = selectedLocation ? job.location === selectedLocation : true;
       return matchesSearch && matchesJobType && matchesLocation;
@@ -83,27 +88,31 @@ export default function Searchjob() {
         </CommunityTabs>
 
         <div className="job-list">
-          {filteredJobs.map((job, index) => (
-            <div className="job-card" key={index}>
-              <div className="job-header">
-                <div className="title-row">
-                  {compareMode && (
-                    <input
-                      type="checkbox"
-                      className="custom-checkbox"
-                      checked={selectedForCompare.some((j) => j.title === job.title)}
-                      onChange={() => handleCheckboxChange(job)}
-                    />
-                  )}
-                  <h4>{job.title}</h4>
+          {filteredJobs.length === 0 ? (
+            <div style={{ padding: "2rem", color: "#aaa", textAlign: "center" }}>공고가 없습니다.</div>
+          ) : (
+            filteredJobs.map((job, index) => (
+              <div className="job-card" key={index}>
+                <div className="job-header">
+                  <div className="title-row">
+                    {compareMode && (
+                      <input
+                        type="checkbox"
+                        className="custom-checkbox"
+                        checked={selectedForCompare.some((j) => j.title === job.title)}
+                        onChange={() => handleCheckboxChange(job)}
+                      />
+                    )}
+                    <h4>{job.title || ""}</h4>
+                  </div>
+                  <span className="due">~ {job.due || ""}</span>
                 </div>
-                <span className="due">~ {job.due}</span>
+                <p className="company">{job.company || ""}</p>
+                <p className="location">{job.location || ""}</p>
+                <a href={job.link || "#"} target="_blank" rel="noopener noreferrer">상세보기</a>
               </div>
-              <p className="company">{job.company}</p>
-              <p className="location">{job.location}</p>
-              <a href="#">상세보기</a>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {selectedForCompare.length > 0 && (
@@ -153,61 +162,11 @@ export default function Searchjob() {
             </FilterPopup>
           </>
         )}
-
-        <style jsx>{`
-          .custom-checkbox {
-            margin-right: 0.5rem;
-            width: 1.3rem;
-            height: 1.3rem;
-            background-color: white;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            appearance: none;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-          }
-
-          .custom-checkbox:hover {
-            transform: scale(1.15);
-          }
-
-          .custom-checkbox:checked::before {
-            content: "✔";
-            color: #4caf50;
-            position: absolute;
-            top: -0.1rem;
-            left: 0.25rem;
-            font-size: 1.1rem;
-          }
-
-          .comparison-box {
-            background-color: #2b2b2b;
-            padding: 1rem;
-            border-radius: 0.8rem;
-            border: 1px solid #444;
-            margin-top: 1.5rem;
-            color: white;
-          }
-
-          .comparison-grid {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 1rem;
-          }
-
-          .compare-item {
-            background-color: #1e1e1e;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            flex: 1;
-            border: 1px solid #555;
-          }
-        `}</style>
       </div>
     </Container>
   );
 }
+
 
 
 

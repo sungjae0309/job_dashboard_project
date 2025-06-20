@@ -1,84 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
-import { cardStyles } from "./ReusableStyles";
+import { cardStyles } from "./ReusableStyles"; // cardStyles 사용하는 파일만
+
+// import styled from "styled-components";
+// import { cardStyles } from "./ReusableStyles";
 
 export default function CertAndTechDashboard() {
   const [activeTab, setActiveTab] = useState("certs");
+  const [certs, setCerts] = useState([]);
+  const [stacks, setStacks] = useState([]);
 
-  const certs = [
-    {
-      name: "ADsP",
-      job: "데이터 분석",
-      detail: "통계/SQL 기초",
-      due: "~ 2024-04-22",
-      link: "datasemi.kr",
-    },
-    {
-      name: "정보처리기사",
-      job: "SW 개발",
-      detail: "국가공인 자격증",
-      due: "~ 2024-04-25",
-      link: "q-net.or.kr",
-    },
-    {
-      name: "SQLD",
-      job: "DB 관리",
-      detail: "SQL 데이터",
-      due: "~ 2024-05-03",
-      link: "kdata.or.kr",
-    },
-    {
-      name: "AWS",
-      job: "클라우드 기초",
-      detail: "AWS 클라우드 기초 개념 이해",
-      due: "~ 수시",
-      link: "aws.amazon.com",
-    },
-    {
-      name: "컴활1급",
-      job: "사무직, 공공기관",
-      detail: "엑셀 필수 역량",
-      due: "~ 2024-04-30",
-      link: "kamco.or.kr",
-    },
-  ];
+  // FastAPI에서 자격증/스택 목록 받아오기
+  useEffect(() => {
+    // 자격증 리스트 불러오기
+    axios
+      .get("http://192.168.101.36:8000/api/certificates")
+      .then((res) => setCerts(res.data))
+      .catch(() => setCerts([])); // 에러시 빈 배열
 
-  const stacks = [
-    {
-      name: "LangChain",
-      domain: "LLM 기반 챗봇",
-      desc: "GPT + 문서 질의, 에이전트형 서비스",
-      link: "https://www.langchain.com",
-    },
-    {
-      name: "FastAPI",
-      domain: "백엔드 API 개발",
-      desc: "Python 기반 서버, GPT 연동에 적합",
-      link: "https://fastapi.tiangolo.com",
-    },
-    {
-      name: "Pinecone",
-      domain: "벡터 데이터베이스",
-      desc: "임베딩 검색 특화 DB",
-      link: "https://www.pinecone.io",
-    },
-    {
-      name: "Streamlit",
-      domain: "데이터 시각화",
-      desc: "Python 코드만으로 분석 결과 가능",
-      link: "https://www.streamlit.io",
-    },
-    {
-      name: "Next.js",
-      domain: "프론트엔드",
-      desc: "React 기반 프레임워크",
-      link: "https://nextjs.org",
-    },
-  ];
+    // 기술스택 리스트 불러오기
+    axios
+      .get("http://192.168.101.36:8000/api/techstacks")
+      .then((res) => setStacks(res.data))
+      .catch(() => setStacks([]));
+  }, []);
 
   return (
-    <Section>
-      <Tabs>
+    <div>
+      <div>
         <button
           className={activeTab === "certs" ? "active" : ""}
           onClick={() => setActiveTab("certs")}
@@ -91,21 +41,26 @@ export default function CertAndTechDashboard() {
         >
           최소 기술 스택
         </button>
-      </Tabs>
+      </div>
 
       {activeTab === "certs" && (
         <div className="content cert-list">
-          {certs.map((c, index) => (
+          {(certs.length > 0 ? certs : Array.from({ length: 5 })).map((c, index) => (
             <div className="cert" key={index}>
               <div className="left">
-                <h4>{c.name}</h4>
-                <p>{c.job}</p>
-                <span>{c.detail}</span>
+                <h4>{c?.name || ""}</h4>
+                <p>{c?.job || ""}</p>
+                <span>{c?.detail || ""}</span>
               </div>
               <div className="right">
-                <p className="due">{c.due}</p>
-                <a href={`https://${c.link}`} target="_blank" rel="noreferrer">
-                  {c.link}
+                <p className="due">{c?.due || ""}</p>
+                <a
+                  href={c?.link ? (c.link.startsWith("http") ? c.link : `https://${c.link}`) : "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ pointerEvents: c?.link ? "auto" : "none", color: c?.link ? "#0af" : "#aaa" }}
+                >
+                  {c?.link || ""}
                 </a>
               </div>
             </div>
@@ -115,26 +70,34 @@ export default function CertAndTechDashboard() {
 
       {activeTab === "stacks" && (
         <div className="content stack-list">
-          {stacks.map((stack, index) => (
+          {(stacks.length > 0 ? stacks : Array.from({ length: 5 })).map((stack, index) => (
             <div className="stack-card" key={index}>
               <div className="stack-header">
-                <h3>{stack.name}</h3>
+                <h3>{stack?.name || ""}</h3>
               </div>
-              <p className="domain">{stack.domain}</p>
-              <p className="desc">{stack.desc}</p>
-              <a
-                className="link"
-                href={stack.link}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {new URL(stack.link).hostname}
-              </a>
+              <p className="domain">{stack?.domain || ""}</p>
+              <p className="desc">{stack?.desc || ""}</p>
+              {stack?.link ? (
+                <a
+                  className="link"
+                  href={stack.link}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {(() => {
+                    try {
+                      return new URL(stack.link).hostname;
+                    } catch {
+                      return stack.link;
+                    }
+                  })()}
+                </a>
+              ) : null}
             </div>
           ))}
         </div>
       )}
-    </Section>
+    </div>
   );
 }
 
@@ -286,4 +249,4 @@ const Tabs = styled.div`
     }
   }
 `;
-  
+    

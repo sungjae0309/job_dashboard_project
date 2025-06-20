@@ -5,8 +5,10 @@ import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
 import { FaRobot, FaChartLine, FaChartBar,  FaRegCommentDots, FaHeart, FaRegComments, FaSearch  } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
-import { BiBarChartAlt2 } from 'react-icons/bi'
 import { BsChatDots } from 'react-icons/bs'
+
+
+
 
 export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
   return (
@@ -46,10 +48,12 @@ export default function Sidebar({ isOpen, setIsOpen, toggleChatbot }) {
           <BsChatDots />
           <span>챗봇</span>
         </a>
-        <a href="#" data-label="로그아웃" isOpen={isOpen}>
+        
+        <Link to="/logout" data-label="로그아웃" isOpen={isOpen}>
           <FiLogOut />
           <span>로그아웃</span>
-        </a>
+        </Link>
+
       </div>
     </Section>
   );

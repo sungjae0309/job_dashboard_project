@@ -1,27 +1,30 @@
 import React from "react";
-import styled from "styled-components";
+
 import { cardStyles } from "./ReusableStyles";
 import { FaCheckCircle, FaClock, FaGithub, FaPenNib, FaTasks, FaLaptopCode } from "react-icons/fa";
+import styled from "styled-components";
+
+
 
 const challenges = [
   {
     icon: <FaLaptopCode />,
-    text: "프론트엔드 과제형 코딩테스트 1회 완수",
+    text: "",
     status: "complete",
   },
   {
     icon: <FaGithub />,
-    text: "깃허브에 포트폴리오 프로젝트 README 업로드",
+    text: "",
     status: "in-progress",
   },
   {
     icon: <FaTasks />,
-    text: "코테 준비용 알고리즘 문제 5문제 풀기",
+    text: "",
     status: "pending",
   },
   {
     icon: <FaPenNib />,
-    text: "자기소개서 2문항 클리닉 받기",
+    text: "",
     status: "pending",
   },
 ];
@@ -33,7 +36,7 @@ export default function ChallengeRoadmap() {
   return (
     <Wrapper>
       <h3>To-do List</h3>
-      <p className="subtext">🎯 목표 직무: 프론트엔드 개발자 · ⏱ D-5</p>
+      <p className="subtext">🎯 </p>
       <ChallengeList>
         {challenges.map((item, idx) => (
           <ChallengeItem key={idx} status={item.status}>

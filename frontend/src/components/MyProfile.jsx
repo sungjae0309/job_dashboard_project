@@ -1,30 +1,33 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+
 import Sidebar from "./Sidebar";
+import axios from "axios";
 import { FiEdit2, FiCheck, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
+import styled from "styled-components";
+
 
 // 임시 데이터
 const initialProfile = {
-  name: "홍길동",
-  email: "hong@jobmate.com",
-  phone: "010-1234-5678",
-  birth: "2000-01-01",
+  name: "",
+  email: "",
+  phone: "",
+  birth: "",
   education: {
-    level: "대학교4",
-    status: "졸업",
-    school: "서울대학교",
-    major: "컴퓨터공학과",
-    grade: "4.2/4.5",
+    level: "",
+    status: "",
+    school: "",
+    major: "",
+    grade: "",
   },
   experiences: [
-    { type: "프로젝트", value: "AI 챗봇 개발 (github.com/example)" },
-    { type: "자격증", value: "정보처리기사" },
+    { type: "", value: "" },
+    { type: "", value: "" },
   ],
-  jobs: ["백엔드 개발자", "AI 엔지니어"],
+  jobs: ["", ""],
   skills: {
-    언어: [{ name: "C", level: "상" }],
-    프레임워크: [{ name: "ReactJS", level: "상" }],
-    협업툴: [{ name: "Git", level: "중" }],
+    언어: [{ name: "", level: "" }],
+    프레임워크: [{ name: "", level: "" }],
+    협업툴: [{ name: "", level: "" }],
   },
 };
 
@@ -37,14 +40,28 @@ export default function ProfilePage() {
   // 임시 수정 값
   const [draft, setDraft] = useState({});
 
+  // ===== FastAPI 연동 =====
+  useEffect(() => {
+    // 최초 렌더링 시 프로필 불러오기
+    axios.get("http://192.168.101.36:8000/api/profile")
+      .then(res => setProfile(res.data))
+      .catch(() => setProfile(initialProfile));
+  }, []);
+
   // ===== 공통 =====
   const handleEdit = (section) => {
     setEditing(section);
-    setDraft(JSON.parse(JSON.stringify(profile))); // 깊은 복사
+    setDraft(JSON.parse(JSON.stringify(profile)));
   };
-  const handleSave = () => {
-    setProfile(draft);
-    setEditing(null);
+  const handleSave = async () => {
+    try {
+      // FastAPI로 저장
+      await axios.put("http://192.168.101.36:8000/api/profile", draft);
+      setProfile(draft);
+      setEditing(null);
+    } catch (e) {
+      alert("저장 실패! (서버 연결 또는 권한 오류)");
+    }
   };
   const handleCancel = () => setEditing(null);
 
@@ -421,6 +438,9 @@ export default function ProfilePage() {
     </ProfileBg>
   );
 }
+
+// --- 여기에 스타일 컴포넌트 정의가 이어집니다. (원본 코드대로) ---
+
 
 // ===== 스타일 =====
 const sidebarWidth = 260;

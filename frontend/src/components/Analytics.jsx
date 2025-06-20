@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import styled from "styled-components";
-import { cardStyles } from "./ReusableStyles";
 import AIJobModal from "./AIJobModal";
 import { FaMapMarkerAlt, FaCoins, FaHeart, FaRegHeart, FaThumbsUp, FaLink } from "react-icons/fa";
 import { PiTargetDuotone } from "react-icons/pi";
 import { useLikedJobs } from "../contexts/LikedJobsContext";
+import styled from "styled-components";
+import { cardStyles } from "./ReusableStyles"; // cardStyles 사용하는 파일만
+
 
 export default function Analytics() {
   const [showModal, setShowModal] = useState(false);
@@ -15,9 +16,10 @@ export default function Analytics() {
 
   const { likedJobs, toggleLike } = useLikedJobs();
 
+  // FastAPI에서 추천 공고 데이터 불러오기
   const fetchJobPosts = () => {
     axios
-      .get("http://localhost:8000/api/jobs/")
+      .get("http://192.168.101.36:8000/api/analytics/") // <-- FastAPI 엔드포인트!
       .then((response) => {
         setJobPosts(response.data);
         setCurrentJobIndex(0);
@@ -27,16 +29,23 @@ export default function Analytics() {
       });
   };
 
+  // 최초 렌더링 시 데이터 fetch
+  useEffect(() => {
+    fetchJobPosts();
+    // eslint-disable-next-line
+  }, []);
+
+  // 현재 보고 있는 job 데이터 (없으면 null)
+  const job = jobPosts.length > 0 ? jobPosts[currentJobIndex] : null;
+
+  // "다른 추천" 버튼 눌렀을 때 다음 공고로
   const handleNextJob = () => {
+    if (jobPosts.length === 0) return;
     setCurrentJobIndex((prev) => (prev + 1) % jobPosts.length);
   };
 
-  useEffect(() => {
-    fetchJobPosts();
-  }, []);
-
   return (
-    <Section>
+    <div>
       {showModal && <AIJobModal jobPosts={jobPosts} onClose={() => setShowModal(false)} />}
 
       <div className="ai-box open full-width">
@@ -44,83 +53,87 @@ export default function Analytics() {
           <h5>AI 추천 공고</h5>
         </div>
 
-        {jobPosts.length > 0 && (
-          <div className="job-card">
-            <div className="top-info">
-              <div className="company-name">
-                <h3>{jobPosts[currentJobIndex].company_name}</h3>
-              </div>
-            </div>
-
-            <div className="position-info">
-              <p className="title">
-                {jobPosts[currentJobIndex].job_title} / {jobPosts[currentJobIndex].experience_level}
-              </p>
-              <p className="location-type">
-                {jobPosts[currentJobIndex].location} | {jobPosts[currentJobIndex].employment_type}
-              </p>
-              <br></br><p className="slogan">“문 앞으로 일상의 행복을 배달합니다”</p>
-              <span className="deadline highlight">⏱ 마감 D-3</span>
-            </div>
-
-            
-
-            <div className="extras-wrapper visible">
-              <div className="extras">
-                <div className="extra-box">
-                  <PiTargetDuotone className="icon" />
-                  <span>적합도:</span>
-                  <strong className="highlight">87%</strong>
-                  <span className="sub-info">(상위 12%)</span>
-                </div>
-                <div className="extra-box">
-                  <FaCoins className="icon" />
-                  <span>연봉:</span>
-                  <span className="value">4,100만 원 (예상)</span>
-                </div>
-                <div className="extra-box">
-                  <FaMapMarkerAlt className="icon" />
-                  <span>거리:</span>
-                  <span className="value">3.1km</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="interaction-row">
-              <div
-                className={`like-button ${likedJobs.some((j) => j.id === jobPosts[currentJobIndex].id) ? "liked" : ""}`}
-                onClick={() => toggleLike(jobPosts[currentJobIndex])}
-              >
-                {likedJobs.some((j) => j.id === jobPosts[currentJobIndex].id) ? <FaHeart /> : <FaRegHeart />}
-                <span>찜하기</span>
-              </div>
-              <div className="reason-button" onClick={() => setShowChatbot(true)}>
-                <FaThumbsUp />
-                <span>추천 이유</span>
-              </div>
-              <a
-                href={jobPosts[currentJobIndex].link || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-button"
-              >
-                <FaLink />
-                <span>링크 연결</span>
-              </a>
+        {/* 항상 카드 뼈대 렌더링 */}
+        <div className="job-card">
+          <div className="top-info">
+            <div className="company-name">
+              <h3>{job?.company_name || "회사명"}</h3>
             </div>
           </div>
-        )}
+
+          <div className="position-info">
+            <p className="title">
+              {job?.job_title || "포지션"} / {job?.experience_level || "-"}
+            </p>
+            <p className="location-type">
+              {job?.location || "-"} | {job?.employment_type || "-"}
+            </p>
+            <br />
+            <p className="slogan">“{job?.slogan || ""}”</p>
+            <span className="deadline highlight">{job?.deadline || ""}</span>
+          </div>
+
+          <div className="extras-wrapper visible">
+            <div className="extras">
+              <div className="extra-box">
+                <PiTargetDuotone className="icon" />
+                <span>적합도:</span>
+                <strong className="highlight">{job?.match || "-"}</strong>
+                <span className="sub-info"></span>
+              </div>
+              <div className="extra-box">
+                <FaCoins className="icon" />
+                <span>연봉:</span>
+                <span className="value">{job?.salary || "-"}</span>
+              </div>
+              <div className="extra-box">
+                <FaMapMarkerAlt className="icon" />
+                <span>거리:</span>
+                <span className="value">{job?.distance || "-"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="interaction-row">
+            <div
+              className={`like-button ${job && likedJobs.some((j) => j.id === job.id) ? "liked" : ""}`}
+              onClick={() => job && toggleLike(job)}
+              style={{ pointerEvents: job ? "auto" : "none", opacity: job ? 1 : 0.6 }}
+            >
+              {job && likedJobs.some((j) => j.id === job.id) ? <FaHeart /> : <FaRegHeart />}
+              <span>찜하기</span>
+            </div>
+            <div
+              className="reason-button"
+              onClick={() => job && setShowChatbot(true)}
+              style={{ pointerEvents: job ? "auto" : "none", opacity: job ? 1 : 0.6 }}
+            >
+              <FaThumbsUp />
+              <span>추천 이유</span>
+            </div>
+            <a
+              href={job?.link || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-button"
+              style={{ pointerEvents: job?.link ? "auto" : "none", opacity: job?.link ? 1 : 0.6 }}
+            >
+              <FaLink />
+              <span>링크 연결</span>
+            </a>
+          </div>
+        </div>
 
         <div className="button-row">
-          <button className="mentor-toggle-btn" onClick={handleNextJob}>
+          <button className="mentor-toggle-btn" onClick={handleNextJob} disabled={jobPosts.length === 0}>
             다른 추천
           </button>
-          <button className="more-btn" onClick={() => setShowModal(true)}>
+          <button className="more-btn" onClick={() => setShowModal(true)} disabled={jobPosts.length === 0}>
             전체 보기
           </button>
         </div>
       </div>
-    </Section>
+    </div>
   );
 }
 
@@ -173,7 +186,7 @@ const Section = styled.section`
       .company-name {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #white;
+        color: #fff;
         text-align: center;
       }
 
